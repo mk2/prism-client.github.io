@@ -6,12 +6,15 @@ module.exports = '<div>\n    <div v-component="navbar"></div>\n</div>';
 module.exports = {
     template: require('./template.html'),
     replace: true,
+    inherit: true,
     data: function () {
-        return {};
+        return {
+            github_login_url: "https://github.com/login/oauth/authorize?client_id="
+        };
     }
 };
 },{"./template.html":4}],4:[function(require,module,exports){
-module.exports = '<nav class="navbar navbar-default">\n    <div class="container-fluid">\n        <!-- Brand and toggle get grouped for better mobile display -->\n        <div class="navbar-header">\n            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"\n                    data-target="#bs-example-navbar-collapse-1">\n                <span class="sr-only">Toggle navigation</span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n            </button>\n            <a class="navbar-brand" href="#">Prism</a>\n        </div>\n\n        <!-- Collect the nav links, forms, and other content for toggling -->\n        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">\n            <ul class="nav navbar-nav">\n                <li><a href="#">Link</a></li>\n                <li class="dropdown">\n                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown\n                        <span class="caret"></span></a>\n                    <ul class="dropdown-menu" role="menu">\n                        <li><a href="#">Action</a></li>\n                        <li><a href="#">Another action</a></li>\n                        <li><a href="#">Something else here</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">Separated link</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">One more separated link</a></li>\n                    </ul>\n                </li>\n            </ul>\n            <ul class="nav navbar-nav navbar-right">\n                <li><a href="#">Config</a></li>\n            </ul>\n        </div>\n        <!-- /.navbar-collapse -->\n    </div>\n    <!-- /.container-fluid -->\n</nav>';
+module.exports = '<nav class="navbar navbar-default">\n    <div class="container-fluid">\n        <!-- Brand and toggle get grouped for better mobile display -->\n        <div class="navbar-header">\n            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"\n                    data-target="#bs-example-navbar-collapse-1">\n                <span class="sr-only">Toggle navigation</span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n            </button>\n            <a class="navbar-brand" href="#">Prism</a>\n        </div>\n\n        <!-- Collect the nav links, forms, and other content for toggling -->\n        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">\n            <ul class="nav navbar-nav">\n                <li><a href="#">Link</a></li>\n                <li class="dropdown">\n                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown\n                        <span class="caret"></span></a>\n                    <ul class="dropdown-menu" role="menu">\n                        <li><a href="#">Action</a></li>\n                        <li><a href="#">Another action</a></li>\n                        <li><a href="#">Something else here</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">Separated link</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">One more separated link</a></li>\n                    </ul>\n                </li>\n            </ul>\n            <template v-if="!user.login_state">\n                <div class="navbar-form navbar-right">\n                    <a href="{{github_login_url}}" class="btn btn-primary">Login with Github</a>\n                </div>\n            </template>\n            <template v-if="user.login_state">\n                <ul class="nav navbar-nav navbar-right">\n                    <li class="dropdown">\n                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"\n                           aria-expanded="false">Login: {{user.name}}\n                            <span class="caret"></span></a>\n                        <ul class="dropdown-menu" role="menu">\n                            <li><a href="#">Preferences</a></li>\n                            <li class="divider"></li>\n                            <li><a href="#">Logout</a></li>\n                        </ul>\n                    </li>\n                </ul>\n            </template>\n        </div>\n        <!-- /.navbar-collapse -->\n    </div>\n    <!-- /.container-fluid -->\n</nav>';
 },{}],5:[function(require,module,exports){
 // This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
 require('../../js/transition.js')
@@ -19845,7 +19848,12 @@ new Vue({
     },
     template: require("./index.html"),
     data: {
-        text: "ok, mum"
+        text: "ok, mum",
+        user: {
+            id: "",
+            name: "mk2",
+            login_state: false
+        }
     }
 });
 },{"./app.css":1,"./index.html":2,"./navbar-component":3,"bootstrap":5,"insert-css":18,"jquery":19,"vue":80}]},{},[82]);
