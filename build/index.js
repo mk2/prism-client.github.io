@@ -1,18 +1,85 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = '';
 },{}],2:[function(require,module,exports){
-module.exports = '<div>\n    <div v-component="navbar"></div>\n</div>';
-},{}],3:[function(require,module,exports){
+module.exports = {
+
+    template: require("./template.html"),
+    replace:  true,
+    inherit:  true,
+    data:     function () {
+        return {};
+    },
+    created: function() {
+        console.log("currentCtx: ", this.currentCtx);
+    }
+
+};
+},{"./template.html":3}],3:[function(require,module,exports){
+arguments[4][1][0].apply(exports,arguments)
+},{"dup":1}],4:[function(require,module,exports){
+module.exports = '<div>\n    <div v-component="navbar"></div>\n</div>\n<div v-component="{{currentView}}">\n</div>';
+},{}],5:[function(require,module,exports){
 module.exports = {
     template: require('./template.html'),
-    replace: true,
-    data: function () {
+    replace:  true,
+    inherit:  true,
+    data:     function () {
+        return {
+            github_login_url: ""
+        };
+    },
+    methods:  {
+
+        willGetGithubOAuthInfo: function () {
+
+            var self = this;
+
+            return $.ajax({
+                url:      self.prism_base_url + "/ghoauth/",
+                dataType: "json"
+            });
+        }
+
+    },
+    created:  function () {
+
+        var Qs   = require("qs"),
+            self = this;
+
+        this.willGetGithubOAuthInfo().done(function (data, status, jqxhr) {
+
+            console.log("Given github oauth settings: ", data);
+
+            self.github_login_url =
+                data.oauth_entry_url + "?" + Qs.stringify({
+                    client_id:    data.client_id,
+                    state:        data.state,
+                    redirect_uri: "https://prism-client.github.io/ghoauth"
+                });
+
+        }).fail(function (err) {
+
+            console.error(err);
+
+        });
+
+    },
+    computed: {}
+};
+},{"./template.html":6,"qs":27}],6:[function(require,module,exports){
+module.exports = '<nav class="navbar navbar-default">\n    <div class="container-fluid">\n        <!-- Brand and toggle get grouped for better mobile display -->\n        <div class="navbar-header">\n            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"\n                    data-target="#bs-example-navbar-collapse-1">\n                <span class="sr-only">Toggle navigation</span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n            </button>\n            <a class="navbar-brand" href="#">Prism</a>\n        </div>\n\n        <!-- Collect the nav links, forms, and other content for toggling -->\n        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">\n            <ul class="nav navbar-nav">\n                <li><a href="#">Link</a></li>\n                <li class="dropdown">\n                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown\n                        <span class="caret"></span></a>\n                    <ul class="dropdown-menu" role="menu">\n                        <li><a href="#">Action</a></li>\n                        <li><a href="#">Another action</a></li>\n                        <li><a href="#">Something else here</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">Separated link</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">One more separated link</a></li>\n                    </ul>\n                </li>\n            </ul>\n            <template v-if="!user.login_state">\n                <div class="navbar-form navbar-right">\n                    <a href="{{github_login_url}}" class="btn btn-primary">Login with Github</a>\n                </div>\n            </template>\n            <template v-if="user.login_state">\n                <ul class="nav navbar-nav navbar-right">\n                    <li class="dropdown">\n                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"\n                           aria-expanded="false">Login: {{user.name}}\n                            <span class="caret"></span></a>\n                        <ul class="dropdown-menu" role="menu">\n                            <li><a href="#">Preferences</a></li>\n                            <li class="divider"></li>\n                            <li><a href="#">Logout</a></li>\n                        </ul>\n                    </li>\n                </ul>\n            </template>\n        </div>\n        <!-- /.navbar-collapse -->\n    </div>\n    <!-- /.container-fluid -->\n</nav>';
+},{}],7:[function(require,module,exports){
+module.exports = {
+    template: require("./template.html"),
+    replace:  true,
+    inherit:  true,
+    data:     function () {
         return {};
     }
 };
-},{"./template.html":4}],4:[function(require,module,exports){
-module.exports = '<nav class="navbar navbar-default">\n    <div class="container-fluid">\n        <!-- Brand and toggle get grouped for better mobile display -->\n        <div class="navbar-header">\n            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"\n                    data-target="#bs-example-navbar-collapse-1">\n                <span class="sr-only">Toggle navigation</span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n            </button>\n            <a class="navbar-brand" href="#">Prism</a>\n        </div>\n\n        <!-- Collect the nav links, forms, and other content for toggling -->\n        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">\n            <ul class="nav navbar-nav">\n                <li><a href="#">Link</a></li>\n                <li class="dropdown">\n                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown\n                        <span class="caret"></span></a>\n                    <ul class="dropdown-menu" role="menu">\n                        <li><a href="#">Action</a></li>\n                        <li><a href="#">Another action</a></li>\n                        <li><a href="#">Something else here</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">Separated link</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">One more separated link</a></li>\n                    </ul>\n                </li>\n            </ul>\n            <ul class="nav navbar-nav navbar-right">\n                <li><a href="#">Config</a></li>\n            </ul>\n        </div>\n        <!-- /.navbar-collapse -->\n    </div>\n    <!-- /.container-fluid -->\n</nav>';
-},{}],5:[function(require,module,exports){
+},{"./template.html":8}],8:[function(require,module,exports){
+module.exports = '<h1>This is Top (TBD)</h1>';
+},{}],9:[function(require,module,exports){
 // This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
 require('../../js/transition.js')
 require('../../js/alert.js')
@@ -26,7 +93,7 @@ require('../../js/popover.js')
 require('../../js/scrollspy.js')
 require('../../js/tab.js')
 require('../../js/affix.js')
-},{"../../js/affix.js":6,"../../js/alert.js":7,"../../js/button.js":8,"../../js/carousel.js":9,"../../js/collapse.js":10,"../../js/dropdown.js":11,"../../js/modal.js":12,"../../js/popover.js":13,"../../js/scrollspy.js":14,"../../js/tab.js":15,"../../js/tooltip.js":16,"../../js/transition.js":17}],6:[function(require,module,exports){
+},{"../../js/affix.js":10,"../../js/alert.js":11,"../../js/button.js":12,"../../js/carousel.js":13,"../../js/collapse.js":14,"../../js/dropdown.js":15,"../../js/modal.js":16,"../../js/popover.js":17,"../../js/scrollspy.js":18,"../../js/tab.js":19,"../../js/tooltip.js":20,"../../js/transition.js":21}],10:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.4
  * http://getbootstrap.com/javascript/#affix
@@ -190,7 +257,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],7:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.4
  * http://getbootstrap.com/javascript/#alerts
@@ -286,7 +353,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],8:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.4
  * http://getbootstrap.com/javascript/#buttons
@@ -404,7 +471,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],9:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.4
  * http://getbootstrap.com/javascript/#carousel
@@ -643,7 +710,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],10:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.4
  * http://getbootstrap.com/javascript/#collapse
@@ -856,7 +923,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],11:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.4
  * http://getbootstrap.com/javascript/#dropdowns
@@ -1019,7 +1086,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],12:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.4
  * http://getbootstrap.com/javascript/#modals
@@ -1360,7 +1427,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],13:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.4
  * http://getbootstrap.com/javascript/#popovers
@@ -1470,7 +1537,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],14:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.4
  * http://getbootstrap.com/javascript/#scrollspy
@@ -1644,7 +1711,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],15:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.4
  * http://getbootstrap.com/javascript/#tabs
@@ -1799,7 +1866,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],16:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.4
  * http://getbootstrap.com/javascript/#tooltip
@@ -2277,7 +2344,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],17:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.4
  * http://getbootstrap.com/javascript/#transitions
@@ -2338,7 +2405,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],18:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var inserted = {};
 
 module.exports = function (css, options) {
@@ -2362,7 +2429,7 @@ module.exports = function (css, options) {
     }
 };
 
-},{}],19:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/
@@ -11574,7 +11641,1342 @@ return jQuery;
 
 }));
 
-},{}],20:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
+(function (process){
+  /* globals require, module */
+
+  'use strict';
+
+  /**
+   * Module dependencies.
+   */
+
+  var pathtoRegexp = require('path-to-regexp');
+
+  /**
+   * Module exports.
+   */
+
+  module.exports = page;
+
+  /**
+   * Detect click event
+   */
+  var clickEvent = ('undefined' !== typeof document) && document.ontouchstart ? 'touchstart' : 'click';
+
+  /**
+   * To work properly with the URL
+   * history.location generated polyfill in https://github.com/devote/HTML5-History-API
+   */
+
+  var location = ('undefined' !== typeof window) && (window.history.location || window.location);
+
+  /**
+   * Perform initial dispatch.
+   */
+
+  var dispatch = true;
+
+
+  /**
+   * Decode URL components (query string, pathname, hash).
+   * Accommodates both regular percent encoding and x-www-form-urlencoded format.
+   */
+  var decodeURLComponents = true;
+
+  /**
+   * Base path.
+   */
+
+  var base = '';
+
+  /**
+   * Running flag.
+   */
+
+  var running;
+
+  /**
+   * HashBang option
+   */
+
+  var hashbang = false;
+
+  /**
+   * Previous context, for capturing
+   * page exit events.
+   */
+
+  var prevContext;
+
+  /**
+   * Register `path` with callback `fn()`,
+   * or route `path`, or redirection,
+   * or `page.start()`.
+   *
+   *   page(fn);
+   *   page('*', fn);
+   *   page('/user/:id', load, user);
+   *   page('/user/' + user.id, { some: 'thing' });
+   *   page('/user/' + user.id);
+   *   page('/from', '/to')
+   *   page();
+   *
+   * @param {String|Function} path
+   * @param {Function} fn...
+   * @api public
+   */
+
+  function page(path, fn) {
+    // <callback>
+    if ('function' === typeof path) {
+      return page('*', path);
+    }
+
+    // route <path> to <callback ...>
+    if ('function' === typeof fn) {
+      var route = new Route(path);
+      for (var i = 1; i < arguments.length; ++i) {
+        page.callbacks.push(route.middleware(arguments[i]));
+      }
+      // show <path> with [state]
+    } else if ('string' === typeof path) {
+      page['string' === typeof fn ? 'redirect' : 'show'](path, fn);
+      // start [options]
+    } else {
+      page.start(path);
+    }
+  }
+
+  /**
+   * Callback functions.
+   */
+
+  page.callbacks = [];
+  page.exits = [];
+
+  /**
+   * Current path being processed
+   * @type {String}
+   */
+  page.current = '';
+
+  /**
+   * Number of pages navigated to.
+   * @type {number}
+   *
+   *     page.len == 0;
+   *     page('/login');
+   *     page.len == 1;
+   */
+
+  page.len = 0;
+
+  /**
+   * Get or set basepath to `path`.
+   *
+   * @param {String} path
+   * @api public
+   */
+
+  page.base = function(path) {
+    if (0 === arguments.length) return base;
+    base = path;
+  };
+
+  /**
+   * Bind with the given `options`.
+   *
+   * Options:
+   *
+   *    - `click` bind to click events [true]
+   *    - `popstate` bind to popstate [true]
+   *    - `dispatch` perform initial dispatch [true]
+   *
+   * @param {Object} options
+   * @api public
+   */
+
+  page.start = function(options) {
+    options = options || {};
+    if (running) return;
+    running = true;
+    if (false === options.dispatch) dispatch = false;
+    if (false === options.decodeURLComponents) decodeURLComponents = false;
+    if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
+    if (false !== options.click) {
+      document.addEventListener(clickEvent, onclick, false);
+    }
+    if (true === options.hashbang) hashbang = true;
+    if (!dispatch) return;
+    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
+    page.replace(url, null, true, dispatch);
+  };
+
+  /**
+   * Unbind click and popstate event handlers.
+   *
+   * @api public
+   */
+
+  page.stop = function() {
+    if (!running) return;
+    page.current = '';
+    page.len = 0;
+    running = false;
+    document.removeEventListener(clickEvent, onclick, false);
+    window.removeEventListener('popstate', onpopstate, false);
+  };
+
+  /**
+   * Show `path` with optional `state` object.
+   *
+   * @param {String} path
+   * @param {Object} state
+   * @param {Boolean} dispatch
+   * @return {Context}
+   * @api public
+   */
+
+  page.show = function(path, state, dispatch, push) {
+    var ctx = new Context(path, state);
+    page.current = ctx.path;
+    if (false !== dispatch) page.dispatch(ctx);
+    if (false !== ctx.handled && false !== push) ctx.pushState();
+    return ctx;
+  };
+
+  /**
+   * Goes back in the history
+   * Back should always let the current route push state and then go back.
+   *
+   * @param {String} path - fallback path to go back if no more history exists, if undefined defaults to page.base
+   * @param {Object} [state]
+   * @api public
+   */
+
+  page.back = function(path, state) {
+    if (page.len > 0) {
+      // this may need more testing to see if all browsers
+      // wait for the next tick to go back in history
+      history.back();
+      page.len--;
+    } else if (path) {
+      setTimeout(function() {
+        page.show(path, state);
+      });
+    }else{
+      setTimeout(function() {
+        page.show(base, state);
+      });
+    }
+  };
+
+
+  /**
+   * Register route to redirect from one path to other
+   * or just redirect to another route
+   *
+   * @param {String} from - if param 'to' is undefined redirects to 'from'
+   * @param {String} [to]
+   * @api public
+   */
+  page.redirect = function(from, to) {
+    // Define route from a path to another
+    if ('string' === typeof from && 'string' === typeof to) {
+      page(from, function(e) {
+        setTimeout(function() {
+          page.replace(to);
+        }, 0);
+      });
+    }
+
+    // Wait for the push state and replace it with another
+    if ('string' === typeof from && 'undefined' === typeof to) {
+      setTimeout(function() {
+        page.replace(from);
+      }, 0);
+    }
+  };
+
+  /**
+   * Replace `path` with optional `state` object.
+   *
+   * @param {String} path
+   * @param {Object} state
+   * @return {Context}
+   * @api public
+   */
+
+
+  page.replace = function(path, state, init, dispatch) {
+    var ctx = new Context(path, state);
+    page.current = ctx.path;
+    ctx.init = init;
+    ctx.save(); // save before dispatching, which may redirect
+    if (false !== dispatch) page.dispatch(ctx);
+    return ctx;
+  };
+
+  /**
+   * Dispatch the given `ctx`.
+   *
+   * @param {Object} ctx
+   * @api private
+   */
+
+  page.dispatch = function(ctx) {
+    var prev = prevContext,
+      i = 0,
+      j = 0;
+
+    prevContext = ctx;
+
+    function nextExit() {
+      var fn = page.exits[j++];
+      if (!fn) return nextEnter();
+      fn(prev, nextExit);
+    }
+
+    function nextEnter() {
+      var fn = page.callbacks[i++];
+
+      if (ctx.path !== page.current) {
+        ctx.handled = false;
+        return;
+      }
+      if (!fn) return unhandled(ctx);
+      fn(ctx, nextEnter);
+    }
+
+    if (prev) {
+      nextExit();
+    } else {
+      nextEnter();
+    }
+  };
+
+  /**
+   * Unhandled `ctx`. When it's not the initial
+   * popstate then redirect. If you wish to handle
+   * 404s on your own use `page('*', callback)`.
+   *
+   * @param {Context} ctx
+   * @api private
+   */
+
+  function unhandled(ctx) {
+    if (ctx.handled) return;
+    var current;
+
+    if (hashbang) {
+      current = base + location.hash.replace('#!', '');
+    } else {
+      current = location.pathname + location.search;
+    }
+
+    if (current === ctx.canonicalPath) return;
+    page.stop();
+    ctx.handled = false;
+    location.href = ctx.canonicalPath;
+  }
+
+  /**
+   * Register an exit route on `path` with
+   * callback `fn()`, which will be called
+   * on the previous context when a new
+   * page is visited.
+   */
+  page.exit = function(path, fn) {
+    if (typeof path === 'function') {
+      return page.exit('*', path);
+    }
+
+    var route = new Route(path);
+    for (var i = 1; i < arguments.length; ++i) {
+      page.exits.push(route.middleware(arguments[i]));
+    }
+  };
+
+  /**
+   * Remove URL encoding from the given `str`.
+   * Accommodates whitespace in both x-www-form-urlencoded
+   * and regular percent-encoded form.
+   *
+   * @param {str} URL component to decode
+   */
+  function decodeURLEncodedURIComponent(val) {
+    if (typeof val !== 'string') { return val; }
+    return decodeURLComponents ? decodeURIComponent(val.replace(/\+/g, ' ')) : val;
+  }
+
+  /**
+   * Initialize a new "request" `Context`
+   * with the given `path` and optional initial `state`.
+   *
+   * @param {String} path
+   * @param {Object} state
+   * @api public
+   */
+
+  function Context(path, state) {
+    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
+    var i = path.indexOf('?');
+
+    this.canonicalPath = path;
+    this.path = path.replace(base, '') || '/';
+    if (hashbang) this.path = this.path.replace('#!', '') || '/';
+
+    this.title = document.title;
+    this.state = state || {};
+    this.state.path = path;
+    this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
+    this.pathname = decodeURLEncodedURIComponent(~i ? path.slice(0, i) : path);
+    this.params = {};
+
+    // fragment
+    this.hash = '';
+    if (!hashbang) {
+      if (!~this.path.indexOf('#')) return;
+      var parts = this.path.split('#');
+      this.path = parts[0];
+      this.hash = decodeURLEncodedURIComponent(parts[1]) || '';
+      this.querystring = this.querystring.split('#')[0];
+    }
+  }
+
+  /**
+   * Expose `Context`.
+   */
+
+  page.Context = Context;
+
+  /**
+   * Push state.
+   *
+   * @api private
+   */
+
+  Context.prototype.pushState = function() {
+    page.len++;
+    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+  };
+
+  /**
+   * Save the context state.
+   *
+   * @api public
+   */
+
+  Context.prototype.save = function() {
+    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+  };
+
+  /**
+   * Initialize `Route` with the given HTTP `path`,
+   * and an array of `callbacks` and `options`.
+   *
+   * Options:
+   *
+   *   - `sensitive`    enable case-sensitive routes
+   *   - `strict`       enable strict matching for trailing slashes
+   *
+   * @param {String} path
+   * @param {Object} options.
+   * @api private
+   */
+
+  function Route(path, options) {
+    options = options || {};
+    this.path = (path === '*') ? '(.*)' : path;
+    this.method = 'GET';
+    this.regexp = pathtoRegexp(this.path,
+      this.keys = [],
+      options.sensitive,
+      options.strict);
+  }
+
+  /**
+   * Expose `Route`.
+   */
+
+  page.Route = Route;
+
+  /**
+   * Return route middleware with
+   * the given callback `fn()`.
+   *
+   * @param {Function} fn
+   * @return {Function}
+   * @api public
+   */
+
+  Route.prototype.middleware = function(fn) {
+    var self = this;
+    return function(ctx, next) {
+      if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
+      next();
+    };
+  };
+
+  /**
+   * Check if this route matches `path`, if so
+   * populate `params`.
+   *
+   * @param {String} path
+   * @param {Object} params
+   * @return {Boolean}
+   * @api private
+   */
+
+  Route.prototype.match = function(path, params) {
+    var keys = this.keys,
+      qsIndex = path.indexOf('?'),
+      pathname = ~qsIndex ? path.slice(0, qsIndex) : path,
+      m = this.regexp.exec(decodeURIComponent(pathname));
+
+    if (!m) return false;
+
+    for (var i = 1, len = m.length; i < len; ++i) {
+      var key = keys[i - 1];
+      var val = decodeURLEncodedURIComponent(m[i]);
+      if (val !== undefined || !(hasOwnProperty.call(params, key.name))) {
+        params[key.name] = val;
+      }
+    }
+
+    return true;
+  };
+
+
+  /**
+   * Handle "populate" events.
+   */
+
+  var onpopstate = (function () {
+    var loaded = false;
+    if ('undefined' === typeof window) {
+      return;
+    }
+    if (document.readyState === 'complete') {
+      loaded = true;
+    } else {
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          loaded = true;
+        }, 0);
+      });
+    }
+    return function onpopstate(e) {
+      if (!loaded) return;
+      if (e.state) {
+        var path = e.state.path;
+        page.replace(path, e.state);
+      } else {
+        page.show(location.pathname + location.hash, undefined, undefined, false);
+      }
+    };
+  })();
+  /**
+   * Handle "click" events.
+   */
+
+  function onclick(e) {
+
+    if (1 !== which(e)) return;
+
+    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+    if (e.defaultPrevented) return;
+
+
+
+    // ensure link
+    var el = e.target;
+    while (el && 'A' !== el.nodeName) el = el.parentNode;
+    if (!el || 'A' !== el.nodeName) return;
+
+
+
+    // Ignore if tag has
+    // 1. "download" attribute
+    // 2. rel="external" attribute
+    if (el.hasAttribute('download') || el.getAttribute('rel') === 'external') return;
+
+    // ensure non-hash for the same path
+    var link = el.getAttribute('href');
+    if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
+
+
+
+    // Check for mailto: in the href
+    if (link && link.indexOf('mailto:') > -1) return;
+
+    // check target
+    if (el.target) return;
+
+    // x-origin
+    if (!sameOrigin(el.href)) return;
+
+
+
+    // rebuild path
+    var path = el.pathname + el.search + (el.hash || '');
+
+    // strip leading "/[drive letter]:" on NW.js on Windows
+    if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {
+      path = path.replace(/^\/[a-zA-Z]:\//, '/');
+    }
+
+    // same page
+    var orig = path;
+
+    if (path.indexOf(base) === 0) {
+      path = path.substr(base.length);
+    }
+
+    if (hashbang) path = path.replace('#!', '');
+
+    if (base && orig === path) return;
+
+    e.preventDefault();
+    page.show(orig);
+  }
+
+  /**
+   * Event button.
+   */
+
+  function which(e) {
+    e = e || window.event;
+    return null === e.which ? e.button : e.which;
+  }
+
+  /**
+   * Check if `href` is the same origin.
+   */
+
+  function sameOrigin(href) {
+    var origin = location.protocol + '//' + location.hostname;
+    if (location.port) origin += ':' + location.port;
+    return (href && (0 === href.indexOf(origin)));
+  }
+
+  page.sameOrigin = sameOrigin;
+
+}).call(this,require('_process'))
+},{"_process":94,"path-to-regexp":25}],25:[function(require,module,exports){
+var isArray = require('isarray');
+
+/**
+ * Expose `pathToRegexp`.
+ */
+module.exports = pathToRegexp;
+
+/**
+ * The main path matching regexp utility.
+ *
+ * @type {RegExp}
+ */
+var PATH_REGEXP = new RegExp([
+  // Match escaped characters that would otherwise appear in future matches.
+  // This allows the user to escape special characters that won't transform.
+  '(\\\\.)',
+  // Match Express-style parameters and un-named parameters with a prefix
+  // and optional suffixes. Matches appear as:
+  //
+  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?"]
+  // "/route(\\d+)" => [undefined, undefined, undefined, "\d+", undefined]
+  '([\\/.])?(?:\\:(\\w+)(?:\\(((?:\\\\.|[^)])*)\\))?|\\(((?:\\\\.|[^)])*)\\))([+*?])?',
+  // Match regexp special characters that are always escaped.
+  '([.+*?=^!:${}()[\\]|\\/])'
+].join('|'), 'g');
+
+/**
+ * Escape the capturing group by escaping special characters and meaning.
+ *
+ * @param  {String} group
+ * @return {String}
+ */
+function escapeGroup (group) {
+  return group.replace(/([=!:$\/()])/g, '\\$1');
+}
+
+/**
+ * Attach the keys as a property of the regexp.
+ *
+ * @param  {RegExp} re
+ * @param  {Array}  keys
+ * @return {RegExp}
+ */
+function attachKeys (re, keys) {
+  re.keys = keys;
+  return re;
+}
+
+/**
+ * Get the flags for a regexp from the options.
+ *
+ * @param  {Object} options
+ * @return {String}
+ */
+function flags (options) {
+  return options.sensitive ? '' : 'i';
+}
+
+/**
+ * Pull out keys from a regexp.
+ *
+ * @param  {RegExp} path
+ * @param  {Array}  keys
+ * @return {RegExp}
+ */
+function regexpToRegexp (path, keys) {
+  // Use a negative lookahead to match only capturing groups.
+  var groups = path.source.match(/\((?!\?)/g);
+
+  if (groups) {
+    for (var i = 0; i < groups.length; i++) {
+      keys.push({
+        name:      i,
+        delimiter: null,
+        optional:  false,
+        repeat:    false
+      });
+    }
+  }
+
+  return attachKeys(path, keys);
+}
+
+/**
+ * Transform an array into a regexp.
+ *
+ * @param  {Array}  path
+ * @param  {Array}  keys
+ * @param  {Object} options
+ * @return {RegExp}
+ */
+function arrayToRegexp (path, keys, options) {
+  var parts = [];
+
+  for (var i = 0; i < path.length; i++) {
+    parts.push(pathToRegexp(path[i], keys, options).source);
+  }
+
+  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
+  return attachKeys(regexp, keys);
+}
+
+/**
+ * Replace the specific tags with regexp strings.
+ *
+ * @param  {String} path
+ * @param  {Array}  keys
+ * @return {String}
+ */
+function replacePath (path, keys) {
+  var index = 0;
+
+  function replace (_, escaped, prefix, key, capture, group, suffix, escape) {
+    if (escaped) {
+      return escaped;
+    }
+
+    if (escape) {
+      return '\\' + escape;
+    }
+
+    var repeat   = suffix === '+' || suffix === '*';
+    var optional = suffix === '?' || suffix === '*';
+
+    keys.push({
+      name:      key || index++,
+      delimiter: prefix || '/',
+      optional:  optional,
+      repeat:    repeat
+    });
+
+    prefix = prefix ? ('\\' + prefix) : '';
+    capture = escapeGroup(capture || group || '[^' + (prefix || '\\/') + ']+?');
+
+    if (repeat) {
+      capture = capture + '(?:' + prefix + capture + ')*';
+    }
+
+    if (optional) {
+      return '(?:' + prefix + '(' + capture + '))?';
+    }
+
+    // Basic parameter support.
+    return prefix + '(' + capture + ')';
+  }
+
+  return path.replace(PATH_REGEXP, replace);
+}
+
+/**
+ * Normalize the given path string, returning a regular expression.
+ *
+ * An empty array can be passed in for the keys, which will hold the
+ * placeholder key descriptions. For example, using `/user/:id`, `keys` will
+ * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
+ *
+ * @param  {(String|RegExp|Array)} path
+ * @param  {Array}                 [keys]
+ * @param  {Object}                [options]
+ * @return {RegExp}
+ */
+function pathToRegexp (path, keys, options) {
+  keys = keys || [];
+
+  if (!isArray(keys)) {
+    options = keys;
+    keys = [];
+  } else if (!options) {
+    options = {};
+  }
+
+  if (path instanceof RegExp) {
+    return regexpToRegexp(path, keys, options);
+  }
+
+  if (isArray(path)) {
+    return arrayToRegexp(path, keys, options);
+  }
+
+  var strict = options.strict;
+  var end = options.end !== false;
+  var route = replacePath(path, keys);
+  var endsWithSlash = path.charAt(path.length - 1) === '/';
+
+  // In non-strict mode we allow a slash at the end of match. If the path to
+  // match already ends with a slash, we remove it for consistency. The slash
+  // is valid at the end of a path match, not in the middle. This is important
+  // in non-ending mode, where "/test/" shouldn't match "/test//route".
+  if (!strict) {
+    route = (endsWithSlash ? route.slice(0, -2) : route) + '(?:\\/(?=$))?';
+  }
+
+  if (end) {
+    route += '$';
+  } else {
+    // In non-ending mode, we need the capturing groups to match as much as
+    // possible by using a positive lookahead to the end or next path segment.
+    route += strict && endsWithSlash ? '' : '(?=\\/|$)';
+  }
+
+  return attachKeys(new RegExp('^' + route, flags(options)), keys);
+}
+
+},{"isarray":26}],26:[function(require,module,exports){
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
+};
+
+},{}],27:[function(require,module,exports){
+module.exports = require('./lib/');
+
+},{"./lib/":28}],28:[function(require,module,exports){
+// Load modules
+
+var Stringify = require('./stringify');
+var Parse = require('./parse');
+
+
+// Declare internals
+
+var internals = {};
+
+
+module.exports = {
+    stringify: Stringify,
+    parse: Parse
+};
+
+},{"./parse":29,"./stringify":30}],29:[function(require,module,exports){
+// Load modules
+
+var Utils = require('./utils');
+
+
+// Declare internals
+
+var internals = {
+    delimiter: '&',
+    depth: 5,
+    arrayLimit: 20,
+    parameterLimit: 1000,
+    strictNullHandling: false
+};
+
+
+internals.parseValues = function (str, options) {
+
+    var obj = {};
+    var parts = str.split(options.delimiter, options.parameterLimit === Infinity ? undefined : options.parameterLimit);
+
+    for (var i = 0, il = parts.length; i < il; ++i) {
+        var part = parts[i];
+        var pos = part.indexOf(']=') === -1 ? part.indexOf('=') : part.indexOf(']=') + 1;
+
+        if (pos === -1) {
+            obj[Utils.decode(part)] = '';
+
+            if (options.strictNullHandling) {
+                obj[Utils.decode(part)] = null;
+            }
+        }
+        else {
+            var key = Utils.decode(part.slice(0, pos));
+            var val = Utils.decode(part.slice(pos + 1));
+
+            if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+                obj[key] = val;
+            }
+            else {
+                obj[key] = [].concat(obj[key]).concat(val);
+            }
+        }
+    }
+
+    return obj;
+};
+
+
+internals.parseObject = function (chain, val, options) {
+
+    if (!chain.length) {
+        return val;
+    }
+
+    var root = chain.shift();
+
+    var obj;
+    if (root === '[]') {
+        obj = [];
+        obj = obj.concat(internals.parseObject(chain, val, options));
+    }
+    else {
+        obj = Object.create(null);
+        var cleanRoot = root[0] === '[' && root[root.length - 1] === ']' ? root.slice(1, root.length - 1) : root;
+        var index = parseInt(cleanRoot, 10);
+        var indexString = '' + index;
+        if (!isNaN(index) &&
+            root !== cleanRoot &&
+            indexString === cleanRoot &&
+            index >= 0 &&
+            (options.parseArrays &&
+             index <= options.arrayLimit)) {
+
+            obj = [];
+            obj[index] = internals.parseObject(chain, val, options);
+        }
+        else {
+            obj[cleanRoot] = internals.parseObject(chain, val, options);
+        }
+    }
+
+    return obj;
+};
+
+
+internals.parseKeys = function (key, val, options) {
+
+    if (!key) {
+        return;
+    }
+
+    // Transform dot notation to bracket notation
+
+    if (options.allowDots) {
+        key = key.replace(/\.([^\.\[]+)/g, '[$1]');
+    }
+
+    // The regex chunks
+
+    var parent = /^([^\[\]]*)/;
+    var child = /(\[[^\[\]]*\])/g;
+
+    // Get the parent
+
+    var segment = parent.exec(key);
+
+    // Stash the parent if it exists
+
+    var keys = [];
+    if (segment[1]) {
+        keys.push(segment[1]);
+    }
+
+    // Loop through children appending to the array until we hit depth
+
+    var i = 0;
+    while ((segment = child.exec(key)) !== null && i < options.depth) {
+
+        ++i;
+        keys.push(segment[1]);
+    }
+
+    // If there's a remainder, just add whatever is left
+
+    if (segment) {
+        keys.push('[' + key.slice(segment.index) + ']');
+    }
+
+    return internals.parseObject(keys, val, options);
+};
+
+
+module.exports = function (str, options) {
+
+    if (str === '' ||
+        str === null ||
+        typeof str === 'undefined') {
+
+        return Object.create(null);
+    }
+
+    options = options || {};
+    options.delimiter = typeof options.delimiter === 'string' || Utils.isRegExp(options.delimiter) ? options.delimiter : internals.delimiter;
+    options.depth = typeof options.depth === 'number' ? options.depth : internals.depth;
+    options.arrayLimit = typeof options.arrayLimit === 'number' ? options.arrayLimit : internals.arrayLimit;
+    options.parseArrays = options.parseArrays !== false;
+    options.allowDots = options.allowDots !== false;
+    options.parameterLimit = typeof options.parameterLimit === 'number' ? options.parameterLimit : internals.parameterLimit;
+    options.strictNullHandling = typeof options.strictNullHandling === 'boolean' ? options.strictNullHandling : internals.strictNullHandling;
+
+
+    var tempObj = typeof str === 'string' ? internals.parseValues(str, options) : str;
+    var obj = Object.create(null);
+
+    // Iterate over the keys and setup the new object
+
+    var keys = Object.keys(tempObj);
+    for (var i = 0, il = keys.length; i < il; ++i) {
+        var key = keys[i];
+        var newObj = internals.parseKeys(key, tempObj[key], options);
+        obj = Utils.merge(obj, newObj);
+    }
+
+    return Utils.compact(obj);
+};
+
+},{"./utils":31}],30:[function(require,module,exports){
+// Load modules
+
+var Utils = require('./utils');
+
+
+// Declare internals
+
+var internals = {
+    delimiter: '&',
+    arrayPrefixGenerators: {
+        brackets: function (prefix, key) {
+
+            return prefix + '[]';
+        },
+        indices: function (prefix, key) {
+
+            return prefix + '[' + key + ']';
+        },
+        repeat: function (prefix, key) {
+
+            return prefix;
+        }
+    },
+    strictNullHandling: false
+};
+
+
+internals.stringify = function (obj, prefix, generateArrayPrefix, strictNullHandling, filter) {
+
+    if (typeof filter === 'function') {
+        obj = filter(prefix, obj);
+    }
+    else if (Utils.isBuffer(obj)) {
+        obj = obj.toString();
+    }
+    else if (obj instanceof Date) {
+        obj = obj.toISOString();
+    }
+    else if (obj === null) {
+        if (strictNullHandling) {
+            return Utils.encode(prefix);
+        }
+
+        obj = '';
+    }
+
+    if (typeof obj === 'string' ||
+        typeof obj === 'number' ||
+        typeof obj === 'boolean') {
+
+        return [Utils.encode(prefix) + '=' + Utils.encode(obj)];
+    }
+
+    var values = [];
+
+    if (typeof obj === 'undefined') {
+        return values;
+    }
+
+    var objKeys = Array.isArray(filter) ? filter : Object.keys(obj);
+    for (var i = 0, il = objKeys.length; i < il; ++i) {
+        var key = objKeys[i];
+
+        if (Array.isArray(obj)) {
+            values = values.concat(internals.stringify(obj[key], generateArrayPrefix(prefix, key), generateArrayPrefix, strictNullHandling, filter));
+        }
+        else {
+            values = values.concat(internals.stringify(obj[key], prefix + '[' + key + ']', generateArrayPrefix, strictNullHandling, filter));
+        }
+    }
+
+    return values;
+};
+
+
+module.exports = function (obj, options) {
+
+    options = options || {};
+    var delimiter = typeof options.delimiter === 'undefined' ? internals.delimiter : options.delimiter;
+    var strictNullHandling = typeof options.strictNullHandling === 'boolean' ? options.strictNullHandling : internals.strictNullHandling;
+    var objKeys;
+    var filter;
+    if (typeof options.filter === 'function') {
+        filter = options.filter;
+        obj = filter('', obj);
+    }
+    else if (Array.isArray(options.filter)) {
+        objKeys = filter = options.filter;
+    }
+
+    var keys = [];
+
+    if (typeof obj !== 'object' ||
+        obj === null) {
+
+        return '';
+    }
+
+    var arrayFormat;
+    if (options.arrayFormat in internals.arrayPrefixGenerators) {
+        arrayFormat = options.arrayFormat;
+    }
+    else if ('indices' in options) {
+        arrayFormat = options.indices ? 'indices' : 'repeat';
+    }
+    else {
+        arrayFormat = 'indices';
+    }
+
+    var generateArrayPrefix = internals.arrayPrefixGenerators[arrayFormat];
+
+    if (!objKeys) {
+        objKeys = Object.keys(obj);
+    }
+    for (var i = 0, il = objKeys.length; i < il; ++i) {
+        var key = objKeys[i];
+        keys = keys.concat(internals.stringify(obj[key], key, generateArrayPrefix, strictNullHandling, filter));
+    }
+
+    return keys.join(delimiter);
+};
+
+},{"./utils":31}],31:[function(require,module,exports){
+// Load modules
+
+
+// Declare internals
+
+var internals = {};
+internals.hexTable = new Array(256);
+for (var i = 0; i < 256; ++i) {
+    internals.hexTable[i] = '%' + ((i < 16 ? '0' : '') + i.toString(16)).toUpperCase();
+}
+
+
+exports.arrayToObject = function (source) {
+
+    var obj = Object.create(null);
+    for (var i = 0, il = source.length; i < il; ++i) {
+        if (typeof source[i] !== 'undefined') {
+
+            obj[i] = source[i];
+        }
+    }
+
+    return obj;
+};
+
+
+exports.merge = function (target, source) {
+
+    if (!source) {
+        return target;
+    }
+
+    if (typeof source !== 'object') {
+        if (Array.isArray(target)) {
+            target.push(source);
+        }
+        else if (typeof target === 'object') {
+            target[source] = true;
+        }
+        else {
+            target = [target, source];
+        }
+
+        return target;
+    }
+
+    if (typeof target !== 'object') {
+        target = [target].concat(source);
+        return target;
+    }
+
+    if (Array.isArray(target) &&
+        !Array.isArray(source)) {
+
+        target = exports.arrayToObject(target);
+    }
+
+    var keys = Object.keys(source);
+    for (var k = 0, kl = keys.length; k < kl; ++k) {
+        var key = keys[k];
+        var value = source[key];
+
+        if (!target[key]) {
+            target[key] = value;
+        }
+        else {
+            target[key] = exports.merge(target[key], value);
+        }
+    }
+
+    return target;
+};
+
+
+exports.decode = function (str) {
+
+    try {
+        return decodeURIComponent(str.replace(/\+/g, ' '));
+    } catch (e) {
+        return str;
+    }
+};
+
+exports.encode = function (str) {
+
+    // This code was originally written by Brian White (mscdex) for the io.js core querystring library.
+    // It has been adapted here for stricter adherence to RFC 3986
+    if (str.length === 0) {
+        return str;
+    }
+
+    if (typeof str !== 'string') {
+        str = '' + str;
+    }
+
+    var out = '';
+    for (var i = 0, il = str.length; i < il; ++i) {
+        var c = str.charCodeAt(i);
+
+        if (c === 0x2D || // -
+            c === 0x2E || // .
+            c === 0x5F || // _
+            c === 0x7E || // ~
+            (c >= 0x30 && c <= 0x39) || // 0-9
+            (c >= 0x41 && c <= 0x5A) || // a-z
+            (c >= 0x61 && c <= 0x7A)) { // A-Z
+
+            out += str[i];
+            continue;
+        }
+
+        if (c < 0x80) {
+            out += internals.hexTable[c];
+            continue;
+        }
+
+        if (c < 0x800) {
+            out += internals.hexTable[0xC0 | (c >> 6)] + internals.hexTable[0x80 | (c & 0x3F)];
+            continue;
+        }
+
+        if (c < 0xD800 || c >= 0xE000) {
+            out += internals.hexTable[0xE0 | (c >> 12)] + internals.hexTable[0x80 | ((c >> 6) & 0x3F)] + internals.hexTable[0x80 | (c & 0x3F)];
+            continue;
+        }
+
+        ++i;
+        c = 0x10000 + (((c & 0x3FF) << 10) | (str.charCodeAt(i) & 0x3FF));
+        out += internals.hexTable[0xF0 | (c >> 18)] + internals.hexTable[0x80 | ((c >> 12) & 0x3F)] + internals.hexTable[0x80 | ((c >> 6) & 0x3F)] + internals.hexTable[0x80 | (c & 0x3F)];
+    }
+
+    return out;
+};
+
+exports.compact = function (obj, refs) {
+
+    if (typeof obj !== 'object' ||
+        obj === null) {
+
+        return obj;
+    }
+
+    refs = refs || [];
+    var lookup = refs.indexOf(obj);
+    if (lookup !== -1) {
+        return refs[lookup];
+    }
+
+    refs.push(obj);
+
+    if (Array.isArray(obj)) {
+        var compacted = [];
+
+        for (var i = 0, il = obj.length; i < il; ++i) {
+            if (typeof obj[i] !== 'undefined') {
+                compacted.push(obj[i]);
+            }
+        }
+
+        return compacted;
+    }
+
+    var keys = Object.keys(obj);
+    for (i = 0, il = keys.length; i < il; ++i) {
+        var key = keys[i];
+        obj[key] = exports.compact(obj[key], refs);
+    }
+
+    return obj;
+};
+
+
+exports.isRegExp = function (obj) {
+
+    return Object.prototype.toString.call(obj) === '[object RegExp]';
+};
+
+
+exports.isBuffer = function (obj) {
+
+    if (obj === null ||
+        typeof obj === 'undefined') {
+
+        return false;
+    }
+
+    return !!(obj.constructor &&
+              obj.constructor.isBuffer &&
+              obj.constructor.isBuffer(obj));
+};
+
+},{}],32:[function(require,module,exports){
 var _ = require('../util')
 
 /**
@@ -11621,7 +13023,7 @@ exports.$addChild = function (opts, BaseCtor) {
   var child = new ChildVue(opts)
   return child
 }
-},{"../util":77}],21:[function(require,module,exports){
+},{"../util":89}],33:[function(require,module,exports){
 var _ = require('../util')
 var Watcher = require('../watcher')
 var Path = require('../parsers/path')
@@ -11788,7 +13190,7 @@ exports.$log = function (path) {
   }
   console.log(data)
 }
-},{"../parsers/directive":65,"../parsers/expression":66,"../parsers/path":67,"../parsers/text":69,"../util":77,"../watcher":81}],22:[function(require,module,exports){
+},{"../parsers/directive":77,"../parsers/expression":78,"../parsers/path":79,"../parsers/text":81,"../util":89,"../watcher":93}],34:[function(require,module,exports){
 var _ = require('../util')
 var transition = require('../transition')
 
@@ -12000,7 +13402,7 @@ function remove (el, vm, cb) {
   _.remove(el)
   if (cb) cb()
 }
-},{"../transition":71,"../util":77}],23:[function(require,module,exports){
+},{"../transition":83,"../util":89}],35:[function(require,module,exports){
 var _ = require('../util')
 
 /**
@@ -12175,7 +13577,7 @@ function modifyListenerCount (vm, event, count) {
     parent = parent.$parent
   }
 }
-},{"../util":77}],24:[function(require,module,exports){
+},{"../util":89}],36:[function(require,module,exports){
 var _ = require('../util')
 var mergeOptions = require('../util/merge-option')
 
@@ -12326,7 +13728,7 @@ function createAssetRegisters (Constructor) {
 }
 
 createAssetRegisters(exports)
-},{"../compiler/compile":28,"../compiler/transclude":29,"../config":30,"../parsers/directive":65,"../parsers/expression":66,"../parsers/path":67,"../parsers/template":68,"../parsers/text":69,"../util":77,"../util/merge-option":79}],25:[function(require,module,exports){
+},{"../compiler/compile":40,"../compiler/transclude":41,"../config":42,"../parsers/directive":77,"../parsers/expression":78,"../parsers/path":79,"../parsers/template":80,"../parsers/text":81,"../util":89,"../util/merge-option":91}],37:[function(require,module,exports){
 var _ = require('../util')
 var compile = require('../compiler/compile')
 
@@ -12399,7 +13801,7 @@ exports.$destroy = function (remove, deferCleanup) {
 exports.$compile = function (el) {
   return compile(el, this.$options, true)(this, el)
 }
-},{"../compiler/compile":28,"../util":77}],26:[function(require,module,exports){
+},{"../compiler/compile":40,"../util":89}],38:[function(require,module,exports){
 var _ = require('./util')
 var MAX_UPDATE_COUNT = 10
 
@@ -12494,7 +13896,7 @@ exports.push = function (job) {
     }
   }
 }
-},{"./util":77}],27:[function(require,module,exports){
+},{"./util":89}],39:[function(require,module,exports){
 /**
  * A doubly linked list-based Least Recently Used (LRU)
  * cache. Will keep most recently used items while
@@ -12607,7 +14009,7 @@ p.get = function (key, returnEntry) {
 }
 
 module.exports = Cache
-},{}],28:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 var _ = require('../util')
 var config = require('../config')
 var textParser = require('../parsers/text')
@@ -13260,7 +14662,7 @@ function checkTransclusion (el) {
     return true
   }
 }
-},{"../config":30,"../parsers/directive":65,"../parsers/template":68,"../parsers/text":69,"../util":77}],29:[function(require,module,exports){
+},{"../config":42,"../parsers/directive":77,"../parsers/template":80,"../parsers/text":81,"../util":89}],41:[function(require,module,exports){
 var _ = require('../util')
 var config = require('../config')
 var templateParser = require('../parsers/template')
@@ -13475,7 +14877,7 @@ function extractAttrs (attrs) {
   }
   return res
 }
-},{"../config":30,"../parsers/template":68,"../util":77}],30:[function(require,module,exports){
+},{"../config":42,"../parsers/template":80,"../util":89}],42:[function(require,module,exports){
 module.exports = {
 
   /**
@@ -13562,7 +14964,7 @@ Object.defineProperty(module.exports, 'delimiters', {
     this._delimitersChanged = true
   }
 })
-},{}],31:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 var _ = require('./util')
 var config = require('./config')
 var Watcher = require('./watcher')
@@ -13787,7 +15189,7 @@ p.set = function (value, lock) {
 }
 
 module.exports = Directive
-},{"./config":30,"./parsers/expression":66,"./parsers/text":69,"./util":77,"./watcher":81}],32:[function(require,module,exports){
+},{"./config":42,"./parsers/expression":78,"./parsers/text":81,"./util":89,"./watcher":93}],44:[function(require,module,exports){
 // xlink
 var xlinkNS = 'http://www.w3.org/1999/xlink'
 var xlinkRE = /^xlink:/
@@ -13820,7 +15222,7 @@ function xlinkHandler (value) {
     this.el.removeAttributeNS(xlinkNS, 'href')
   }
 }
-},{}],33:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 var _ = require('../util')
 var addClass = _.addClass
 var removeClass = _.removeClass
@@ -13839,7 +15241,7 @@ module.exports = function (value) {
     }
   }
 }
-},{"../util":77}],34:[function(require,module,exports){
+},{"../util":89}],46:[function(require,module,exports){
 var config = require('../config')
 
 module.exports = {
@@ -13852,7 +15254,7 @@ module.exports = {
   }
 
 }
-},{"../config":30}],35:[function(require,module,exports){
+},{"../config":42}],47:[function(require,module,exports){
 var _ = require('../util')
 var templateParser = require('../parsers/template')
 
@@ -14083,7 +15485,7 @@ module.exports = {
   }
 
 }
-},{"../parsers/template":68,"../util":77}],36:[function(require,module,exports){
+},{"../parsers/template":80,"../util":89}],48:[function(require,module,exports){
 module.exports = {
 
   isLiteral: true,
@@ -14097,7 +15499,7 @@ module.exports = {
   }
   
 }
-},{}],37:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 var _ = require('../util')
 
 module.exports = {
@@ -14134,7 +15536,7 @@ module.exports = {
   // so no need for unbind here.
 
 }
-},{"../util":77}],38:[function(require,module,exports){
+},{"../util":89}],50:[function(require,module,exports){
 var _ = require('../util')
 var templateParser = require('../parsers/template')
 
@@ -14173,7 +15575,7 @@ module.exports = {
   }
 
 }
-},{"../parsers/template":68,"../util":77}],39:[function(require,module,exports){
+},{"../parsers/template":80,"../util":89}],51:[function(require,module,exports){
 var _ = require('../util')
 var compile = require('../compiler/compile')
 var templateParser = require('../parsers/template')
@@ -14304,7 +15706,7 @@ function callDetach (child) {
     child._callHook('detached')
   }
 }
-},{"../compiler/compile":28,"../parsers/template":68,"../transition":71,"../util":77}],40:[function(require,module,exports){
+},{"../compiler/compile":40,"../parsers/template":80,"../transition":83,"../util":89}],52:[function(require,module,exports){
 // manipulation directives
 exports.text       = require('./text')
 exports.html       = require('./html')
@@ -14330,7 +15732,7 @@ exports['if']      = require('./if')
 // child vm communication directives
 exports['with']    = require('./with')
 exports.events     = require('./events')
-},{"./attr":32,"./class":33,"./cloak":34,"./component":35,"./el":36,"./events":37,"./html":38,"./if":39,"./model":43,"./on":46,"./partial":47,"./ref":48,"./repeat":49,"./show":50,"./style":51,"./text":52,"./transition":53,"./with":54}],41:[function(require,module,exports){
+},{"./attr":44,"./class":45,"./cloak":46,"./component":47,"./el":48,"./events":49,"./html":50,"./if":51,"./model":55,"./on":58,"./partial":59,"./ref":60,"./repeat":61,"./show":62,"./style":63,"./text":64,"./transition":65,"./with":66}],53:[function(require,module,exports){
 var _ = require('../../util')
 
 module.exports = {
@@ -14356,7 +15758,7 @@ module.exports = {
   }
 
 }
-},{"../../util":77}],42:[function(require,module,exports){
+},{"../../util":89}],54:[function(require,module,exports){
 var _ = require('../../util')
 
 module.exports = {
@@ -14505,7 +15907,7 @@ module.exports = {
   }
 
 }
-},{"../../util":77}],43:[function(require,module,exports){
+},{"../../util":89}],55:[function(require,module,exports){
 var _ = require('../../util')
 
 var handlers = {
@@ -14562,7 +15964,7 @@ module.exports = {
   }
 
 }
-},{"../../util":77,"./checkbox":41,"./default":42,"./radio":44,"./select":45}],44:[function(require,module,exports){
+},{"../../util":89,"./checkbox":53,"./default":54,"./radio":56,"./select":57}],56:[function(require,module,exports){
 var _ = require('../../util')
 
 module.exports = {
@@ -14589,7 +15991,7 @@ module.exports = {
   }
 
 }
-},{"../../util":77}],45:[function(require,module,exports){
+},{"../../util":89}],57:[function(require,module,exports){
 var _ = require('../../util')
 var Watcher = require('../../watcher')
 var dirParser = require('../../parsers/directive')
@@ -14770,7 +16172,7 @@ function indexOf (arr, val) {
   }
   return -1
 }
-},{"../../parsers/directive":65,"../../util":77,"../../watcher":81}],46:[function(require,module,exports){
+},{"../../parsers/directive":77,"../../util":89,"../../watcher":93}],58:[function(require,module,exports){
 var _ = require('../util')
 
 module.exports = {
@@ -14830,7 +16232,7 @@ module.exports = {
     _.off(this.el, 'load', this.iframeBind)
   }
 }
-},{"../util":77}],47:[function(require,module,exports){
+},{"../util":89}],59:[function(require,module,exports){
 var _ = require('../util')
 var templateParser = require('../parsers/template')
 var vIf = require('./if')
@@ -14881,7 +16283,7 @@ module.exports = {
   }
 
 }
-},{"../parsers/template":68,"../util":77,"./if":39}],48:[function(require,module,exports){
+},{"../parsers/template":80,"../util":89,"./if":51}],60:[function(require,module,exports){
 var _ = require('../util')
 
 module.exports = {
@@ -14905,7 +16307,7 @@ module.exports = {
   }
   
 }
-},{"../util":77}],49:[function(require,module,exports){
+},{"../util":89}],61:[function(require,module,exports){
 var _ = require('../util')
 var isObject = _.isObject
 var isPlainObject = _.isPlainObject
@@ -15443,7 +16845,7 @@ function range (n) {
   }
   return ret
 }
-},{"../compiler/compile":28,"../compiler/transclude":29,"../parsers/expression":66,"../parsers/template":68,"../parsers/text":69,"../util":77,"../util/merge-option":79}],50:[function(require,module,exports){
+},{"../compiler/compile":40,"../compiler/transclude":41,"../parsers/expression":78,"../parsers/template":80,"../parsers/text":81,"../util":89,"../util/merge-option":91}],62:[function(require,module,exports){
 var transition = require('../transition')
 
 module.exports = function (value) {
@@ -15452,7 +16854,7 @@ module.exports = function (value) {
     el.style.display = value ? '' : 'none'
   }, this.vm)
 }
-},{"../transition":71}],51:[function(require,module,exports){
+},{"../transition":83}],63:[function(require,module,exports){
 var _ = require('../util')
 var prefixes = ['-webkit-', '-moz-', '-ms-']
 var camelPrefixes = ['Webkit', 'Moz', 'ms']
@@ -15553,7 +16955,7 @@ function prefix (prop) {
     }
   }
 }
-},{"../util":77}],52:[function(require,module,exports){
+},{"../util":89}],64:[function(require,module,exports){
 var _ = require('../util')
 
 module.exports = {
@@ -15569,7 +16971,7 @@ module.exports = {
   }
   
 }
-},{"../util":77}],53:[function(require,module,exports){
+},{"../util":89}],65:[function(require,module,exports){
 module.exports = {
 
   priority: 1000,
@@ -15594,7 +16996,7 @@ module.exports = {
   }
 
 }
-},{}],54:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 var _ = require('../util')
 var Watcher = require('../watcher')
 var expParser = require('../parsers/expression')
@@ -15681,7 +17083,7 @@ module.exports = {
   }
 
 }
-},{"../parsers/expression":66,"../util":77,"../watcher":81}],55:[function(require,module,exports){
+},{"../parsers/expression":78,"../util":89,"../watcher":93}],67:[function(require,module,exports){
 var _ = require('../util')
 var Path = require('../parsers/path')
 
@@ -15769,7 +17171,7 @@ function contains (val, search) {
     return val.toString().toLowerCase().indexOf(search) > -1
   }
 }
-},{"../parsers/path":67,"../util":77}],56:[function(require,module,exports){
+},{"../parsers/path":79,"../util":89}],68:[function(require,module,exports){
 var _ = require('../util')
 
 /**
@@ -15907,7 +17309,7 @@ exports.key.keyCodes = keyCodes
 
 _.extend(exports, require('./array-filters'))
 
-},{"../util":77,"./array-filters":55}],57:[function(require,module,exports){
+},{"../util":89,"./array-filters":67}],69:[function(require,module,exports){
 var _ = require('../util')
 var Directive = require('../directive')
 var compile = require('../compiler/compile')
@@ -16074,7 +17476,7 @@ exports._cleanup = function () {
   // turn off all instance listeners.
   this.$off()
 }
-},{"../compiler/compile":28,"../compiler/transclude":29,"../directive":31,"../util":77}],58:[function(require,module,exports){
+},{"../compiler/compile":40,"../compiler/transclude":41,"../directive":43,"../util":89}],70:[function(require,module,exports){
 var _ = require('../util')
 var inDoc = _.inDoc
 
@@ -16213,7 +17615,7 @@ exports._callHook = function (hook) {
   }
   this.$emit('hook:' + hook)
 }
-},{"../util":77}],59:[function(require,module,exports){
+},{"../util":89}],71:[function(require,module,exports){
 var mergeOptions = require('../util/merge-option')
 
 /**
@@ -16311,7 +17713,7 @@ exports._init = function (options) {
     this.$mount(options.el)
   }
 }
-},{"../util/merge-option":79}],60:[function(require,module,exports){
+},{"../util/merge-option":91}],72:[function(require,module,exports){
 var _ = require('../util')
 var Observer = require('../observer')
 var Dep = require('../observer/dep')
@@ -16526,7 +17928,7 @@ exports._defineMeta = function (key, value) {
     }
   })
 }
-},{"../observer":63,"../observer/dep":62,"../util":77}],61:[function(require,module,exports){
+},{"../observer":75,"../observer/dep":74,"../util":89}],73:[function(require,module,exports){
 var _ = require('../util')
 var arrayProto = Array.prototype
 var arrayMethods = Object.create(arrayProto)
@@ -16617,7 +18019,7 @@ _.define(
 )
 
 module.exports = arrayMethods
-},{"../util":77}],62:[function(require,module,exports){
+},{"../util":89}],74:[function(require,module,exports){
 var uid = 0
 var _ = require('../util')
 
@@ -16671,7 +18073,7 @@ p.notify = function () {
 }
 
 module.exports = Dep
-},{"../util":77}],63:[function(require,module,exports){
+},{"../util":89}],75:[function(require,module,exports){
 var _ = require('../util')
 var config = require('../config')
 var Dep = require('./dep')
@@ -16908,7 +18310,7 @@ p.removeVm = function (vm) {
 
 module.exports = Observer
 
-},{"../config":30,"../util":77,"./array":61,"./dep":62,"./object":64}],64:[function(require,module,exports){
+},{"../config":42,"../util":89,"./array":73,"./dep":74,"./object":76}],76:[function(require,module,exports){
 var _ = require('../util')
 var objProto = Object.prototype
 
@@ -16993,7 +18395,7 @@ _.define(
     }
   }
 )
-},{"../util":77}],65:[function(require,module,exports){
+},{"../util":89}],77:[function(require,module,exports){
 var _ = require('../util')
 var Cache = require('../cache')
 var cache = new Cache(1000)
@@ -17153,7 +18555,7 @@ exports.parse = function (s) {
   cache.put(s, dirs)
   return dirs
 }
-},{"../cache":27,"../util":77}],66:[function(require,module,exports){
+},{"../cache":39,"../util":89}],78:[function(require,module,exports){
 var _ = require('../util')
 var Path = require('./path')
 var Cache = require('../cache')
@@ -17409,7 +18811,7 @@ exports.parse = function (exp, needSet) {
 
 // Export the pathRegex for external use
 exports.pathTestRE = pathTestRE
-},{"../cache":27,"../util":77,"./path":67}],67:[function(require,module,exports){
+},{"../cache":39,"../util":89,"./path":79}],79:[function(require,module,exports){
 var _ = require('../util')
 var Cache = require('../cache')
 var pathCache = new Cache(1000)
@@ -17707,7 +19109,7 @@ exports.set = function (obj, path, val) {
   }
   return true
 }
-},{"../cache":27,"../util":77}],68:[function(require,module,exports){
+},{"../cache":39,"../util":89}],80:[function(require,module,exports){
 var _ = require('../util')
 var Cache = require('../cache')
 var templateCache = new Cache(1000)
@@ -17968,7 +19370,7 @@ exports.parse = function (template, clone, noSelector) {
     ? exports.clone(frag)
     : frag
 }
-},{"../cache":27,"../util":77}],69:[function(require,module,exports){
+},{"../cache":39,"../util":89}],81:[function(require,module,exports){
 var Cache = require('../cache')
 var config = require('../config')
 var dirParser = require('./directive')
@@ -18148,7 +19550,7 @@ function inlineFilters (exp) {
     }
   }
 }
-},{"../cache":27,"../config":30,"./directive":65}],70:[function(require,module,exports){
+},{"../cache":39,"../config":42,"./directive":77}],82:[function(require,module,exports){
 var _ = require('../util')
 var addClass = _.addClass
 var removeClass = _.removeClass
@@ -18338,7 +19740,7 @@ module.exports = function (el, direction, op, data, cb) {
     push(el, direction, op, leaveClass, cb)
   }
 }
-},{"../util":77}],71:[function(require,module,exports){
+},{"../util":89}],83:[function(require,module,exports){
 var _ = require('../util')
 var applyCSSTransition = require('./css')
 var applyJSTransition = require('./js')
@@ -18499,7 +19901,7 @@ var apply = exports.apply = function (el, direction, op, vm, cb) {
     if (cb) cb()
   }
 }
-},{"../util":77,"./css":70,"./js":72}],72:[function(require,module,exports){
+},{"../util":89,"./css":82,"./js":84}],84:[function(require,module,exports){
 /**
  * Apply JavaScript enter/leave functions.
  *
@@ -18546,7 +19948,7 @@ module.exports = function (el, direction, op, data, def, vm, cb) {
     }
   }
 }
-},{}],73:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 var config = require('../config')
 
 /**
@@ -18600,7 +20002,7 @@ function enableDebug () {
     }
   }
 }
-},{"../config":30}],74:[function(require,module,exports){
+},{"../config":42}],86:[function(require,module,exports){
 var config = require('../config')
 
 /**
@@ -18810,7 +20212,7 @@ exports.extractContent = function (el, asFragment) {
   return rawContent
 }
 
-},{"../config":30}],75:[function(require,module,exports){
+},{"../config":42}],87:[function(require,module,exports){
 /**
  * Can we use __proto__?
  *
@@ -18912,7 +20314,7 @@ if (inBrowser && !exports.isIE9) {
     ? 'webkitAnimationEnd'
     : 'animationend'
 }
-},{}],76:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 var _ = require('./debug')
 
 /**
@@ -18985,7 +20387,7 @@ exports.applyFilters = function (value, filters, vm, oldVal) {
   }
   return value
 }
-},{"./debug":73}],77:[function(require,module,exports){
+},{"./debug":85}],89:[function(require,module,exports){
 var lang   = require('./lang')
 var extend = lang.extend
 
@@ -18994,7 +20396,7 @@ extend(exports, require('./env'))
 extend(exports, require('./dom'))
 extend(exports, require('./filter'))
 extend(exports, require('./debug'))
-},{"./debug":73,"./dom":74,"./env":75,"./filter":76,"./lang":78}],78:[function(require,module,exports){
+},{"./debug":85,"./dom":86,"./env":87,"./filter":88,"./lang":90}],90:[function(require,module,exports){
 /**
  * Check is a string starts with $ or _
  *
@@ -19225,7 +20627,7 @@ exports.debounce = function(func, wait) {
     return result
   }
 }
-},{}],79:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 var _ = require('./index')
 var extend = _.extend
 
@@ -19484,7 +20886,7 @@ module.exports = function mergeOptions (parent, child, vm) {
   }
   return options
 }
-},{"./index":77}],80:[function(require,module,exports){
+},{"./index":89}],92:[function(require,module,exports){
 var _ = require('./util')
 var extend = _.extend
 
@@ -19569,7 +20971,7 @@ extend(p, require('./api/child'))
 extend(p, require('./api/lifecycle'))
 
 module.exports = _.Vue = Vue
-},{"./api/child":20,"./api/data":21,"./api/dom":22,"./api/events":23,"./api/global":24,"./api/lifecycle":25,"./directives":40,"./filters":56,"./instance/compile":57,"./instance/events":58,"./instance/init":59,"./instance/scope":60,"./util":77}],81:[function(require,module,exports){
+},{"./api/child":32,"./api/data":33,"./api/dom":34,"./api/events":35,"./api/global":36,"./api/lifecycle":37,"./directives":52,"./filters":68,"./instance/compile":69,"./instance/events":70,"./instance/init":71,"./instance/scope":72,"./util":89}],93:[function(require,module,exports){
 var _ = require('./util')
 var config = require('./config')
 var Observer = require('./observer')
@@ -19830,22 +21232,168 @@ function traverse (obj) {
 }
 
 module.exports = Watcher
-},{"./batcher":26,"./config":30,"./observer":63,"./parsers/expression":66,"./util":77}],82:[function(require,module,exports){
+},{"./batcher":38,"./config":42,"./observer":75,"./parsers/expression":78,"./util":89}],94:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            currentQueue[queueIndex].run();
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],95:[function(require,module,exports){
 require('insert-css')(require('./app.css'))
 
 window.$ = window.jQuery = require("jquery");
 require("bootstrap");
 
-var Vue = require("vue");
+var Vue  = require("vue"),
+    Page = require("page"),
+    Qs   = require("qs");
 
-new Vue({
+var vm = new Vue({
+
     el: "#app",
+
     components: {
-        navbar: require("./navbar-component")
+        navbar:  require("./navbar-component"),
+        ghoauth: require("./ghoauth-component"),
+        top:     require("./top-component")
     },
+
     template: require("./index.html"),
+
     data: {
-        text: "ok, mum"
+
+        currentView: "top",
+        currentCtx:  {},
+
+        prism_base_url: "http://localhost:13333",
+
+        user: {
+            id:          "",
+            name:        "mk2",
+            login_state: false
+        },
+
+        github_oauth: {
+            code: ""
+        }
+
+    },
+
+    created: function () {
+
+        var self = this;
+
+        console.log("Start");
+
+        Page("/", function (ctx, next) {
+
+            next();
+        });
+
+        Page("/ghoauth", function (ctx, next) {
+
+            var obj = Qs.parse(ctx.querystring);
+
+            self.github_oauth.code = obj.code;
+            self.currentCtx        = ctx;
+            self.currentView       = "ghoauth";
+
+            next();
+        });
+
+        Page("*", function (ctx, next) {
+
+            next();
+        });
+
+        Page();
+
     }
 });
-},{"./app.css":1,"./index.html":2,"./navbar-component":3,"bootstrap":5,"insert-css":18,"jquery":19,"vue":80}]},{},[82]);
+},{"./app.css":1,"./ghoauth-component":2,"./index.html":4,"./navbar-component":5,"./top-component":7,"bootstrap":9,"insert-css":22,"jquery":23,"page":24,"qs":27,"vue":92}]},{},[95]);
