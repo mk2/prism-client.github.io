@@ -1,42 +1,61 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = '';
 },{}],2:[function(require,module,exports){
-module.exports = '<div>\n    <div v-component="navbar"></div>\n</div>';
-},{}],3:[function(require,module,exports){
+module.exports = {
+
+    template: require("./template.html"),
+    replace:  true,
+    inherit:  true,
+    data:     function () {
+        return {};
+    },
+    created: function() {
+        console.log("currentCtx: ", this.currentCtx);
+    }
+
+};
+},{"./template.html":3}],3:[function(require,module,exports){
+arguments[4][1][0].apply(exports,arguments)
+},{"dup":1}],4:[function(require,module,exports){
+module.exports = '<div>\n    <div v-component="navbar"></div>\n</div>\n<div v-component="{{currentView}}">\n</div>';
+},{}],5:[function(require,module,exports){
 module.exports = {
     template: require('./template.html'),
-    replace: true,
-    inherit: true,
-    data: function () {
+    replace:  true,
+    inherit:  true,
+    data:     function () {
         return {
             github_login_url: ""
         };
     },
-    methods: {
+    methods:  {
 
         willGetGithubOAuthInfo: function () {
 
             var self = this;
 
             return $.ajax({
-                url: self.prism_base_url + "/ghoauth/",
+                url:      self.prism_base_url + "/ghoauth/",
                 dataType: "json"
             });
         }
 
     },
-    created: function () {
+    created:  function () {
 
-        var self = this;
+        var Qs   = require("qs"),
+            self = this;
 
         this.willGetGithubOAuthInfo().done(function (data, status, jqxhr) {
 
             console.log("Given github oauth settings: ", data);
 
             self.github_login_url =
-                data.oauth_entry_url +
-                "?client_id=" + data.client_id +
-                "&state=" + encodeURIComponent(data.state);
+                data.oauth_entry_url + "?" + Qs.stringify({
+                    client_id:    data.client_id,
+                    state:        data.state,
+                    redirect_uri: "https://prism-client.github.io/ghoauth"
+                });
 
         }).fail(function (err) {
 
@@ -45,13 +64,22 @@ module.exports = {
         });
 
     },
-    computed: {
-
+    computed: {}
+};
+},{"./template.html":6,"qs":27}],6:[function(require,module,exports){
+module.exports = '<nav class="navbar navbar-default">\n    <div class="container-fluid">\n        <!-- Brand and toggle get grouped for better mobile display -->\n        <div class="navbar-header">\n            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"\n                    data-target="#bs-example-navbar-collapse-1">\n                <span class="sr-only">Toggle navigation</span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n            </button>\n            <a class="navbar-brand" href="#">Prism</a>\n        </div>\n\n        <!-- Collect the nav links, forms, and other content for toggling -->\n        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">\n            <ul class="nav navbar-nav">\n                <li><a href="#">Link</a></li>\n                <li class="dropdown">\n                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown\n                        <span class="caret"></span></a>\n                    <ul class="dropdown-menu" role="menu">\n                        <li><a href="#">Action</a></li>\n                        <li><a href="#">Another action</a></li>\n                        <li><a href="#">Something else here</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">Separated link</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">One more separated link</a></li>\n                    </ul>\n                </li>\n            </ul>\n            <template v-if="!user.login_state">\n                <div class="navbar-form navbar-right">\n                    <a href="{{github_login_url}}" class="btn btn-primary">Login with Github</a>\n                </div>\n            </template>\n            <template v-if="user.login_state">\n                <ul class="nav navbar-nav navbar-right">\n                    <li class="dropdown">\n                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"\n                           aria-expanded="false">Login: {{user.name}}\n                            <span class="caret"></span></a>\n                        <ul class="dropdown-menu" role="menu">\n                            <li><a href="#">Preferences</a></li>\n                            <li class="divider"></li>\n                            <li><a href="#">Logout</a></li>\n                        </ul>\n                    </li>\n                </ul>\n            </template>\n        </div>\n        <!-- /.navbar-collapse -->\n    </div>\n    <!-- /.container-fluid -->\n</nav>';
+},{}],7:[function(require,module,exports){
+module.exports = {
+    template: require("./template.html"),
+    replace:  true,
+    inherit:  true,
+    data:     function () {
+        return {};
     }
 };
-},{"./template.html":4}],4:[function(require,module,exports){
-module.exports = '<nav class="navbar navbar-default">\n    <div class="container-fluid">\n        <!-- Brand and toggle get grouped for better mobile display -->\n        <div class="navbar-header">\n            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"\n                    data-target="#bs-example-navbar-collapse-1">\n                <span class="sr-only">Toggle navigation</span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n            </button>\n            <a class="navbar-brand" href="#">Prism</a>\n        </div>\n\n        <!-- Collect the nav links, forms, and other content for toggling -->\n        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">\n            <ul class="nav navbar-nav">\n                <li><a href="#">Link</a></li>\n                <li class="dropdown">\n                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown\n                        <span class="caret"></span></a>\n                    <ul class="dropdown-menu" role="menu">\n                        <li><a href="#">Action</a></li>\n                        <li><a href="#">Another action</a></li>\n                        <li><a href="#">Something else here</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">Separated link</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">One more separated link</a></li>\n                    </ul>\n                </li>\n            </ul>\n            <template v-if="!user.login_state">\n                <div class="navbar-form navbar-right">\n                    <a href="{{github_login_url}}" class="btn btn-primary">Login with Github</a>\n                </div>\n            </template>\n            <template v-if="user.login_state">\n                <ul class="nav navbar-nav navbar-right">\n                    <li class="dropdown">\n                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"\n                           aria-expanded="false">Login: {{user.name}}\n                            <span class="caret"></span></a>\n                        <ul class="dropdown-menu" role="menu">\n                            <li><a href="#">Preferences</a></li>\n                            <li class="divider"></li>\n                            <li><a href="#">Logout</a></li>\n                        </ul>\n                    </li>\n                </ul>\n            </template>\n        </div>\n        <!-- /.navbar-collapse -->\n    </div>\n    <!-- /.container-fluid -->\n</nav>';
-},{}],5:[function(require,module,exports){
+},{"./template.html":8}],8:[function(require,module,exports){
+module.exports = '<h1>This is Top (TBD)</h1>';
+},{}],9:[function(require,module,exports){
 // This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
 require('../../js/transition.js')
 require('../../js/alert.js')
@@ -65,7 +93,7 @@ require('../../js/popover.js')
 require('../../js/scrollspy.js')
 require('../../js/tab.js')
 require('../../js/affix.js')
-},{"../../js/affix.js":6,"../../js/alert.js":7,"../../js/button.js":8,"../../js/carousel.js":9,"../../js/collapse.js":10,"../../js/dropdown.js":11,"../../js/modal.js":12,"../../js/popover.js":13,"../../js/scrollspy.js":14,"../../js/tab.js":15,"../../js/tooltip.js":16,"../../js/transition.js":17}],6:[function(require,module,exports){
+},{"../../js/affix.js":10,"../../js/alert.js":11,"../../js/button.js":12,"../../js/carousel.js":13,"../../js/collapse.js":14,"../../js/dropdown.js":15,"../../js/modal.js":16,"../../js/popover.js":17,"../../js/scrollspy.js":18,"../../js/tab.js":19,"../../js/tooltip.js":20,"../../js/transition.js":21}],10:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.4
  * http://getbootstrap.com/javascript/#affix
@@ -229,7 +257,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],7:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.4
  * http://getbootstrap.com/javascript/#alerts
@@ -325,7 +353,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],8:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.4
  * http://getbootstrap.com/javascript/#buttons
@@ -443,7 +471,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],9:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.4
  * http://getbootstrap.com/javascript/#carousel
@@ -682,7 +710,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],10:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.4
  * http://getbootstrap.com/javascript/#collapse
@@ -895,7 +923,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],11:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.4
  * http://getbootstrap.com/javascript/#dropdowns
@@ -1058,7 +1086,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],12:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.4
  * http://getbootstrap.com/javascript/#modals
@@ -1399,7 +1427,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],13:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.4
  * http://getbootstrap.com/javascript/#popovers
@@ -1509,7 +1537,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],14:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.4
  * http://getbootstrap.com/javascript/#scrollspy
@@ -1683,7 +1711,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],15:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.4
  * http://getbootstrap.com/javascript/#tabs
@@ -1838,7 +1866,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],16:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.4
  * http://getbootstrap.com/javascript/#tooltip
@@ -2316,7 +2344,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],17:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.4
  * http://getbootstrap.com/javascript/#transitions
@@ -2377,7 +2405,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],18:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var inserted = {};
 
 module.exports = function (css, options) {
@@ -2401,7 +2429,7 @@ module.exports = function (css, options) {
     }
 };
 
-},{}],19:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/
@@ -11613,7 +11641,7 @@ return jQuery;
 
 }));
 
-},{}],20:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function (process){
   /* globals require, module */
 
@@ -12236,7 +12264,7 @@ return jQuery;
   page.sameOrigin = sameOrigin;
 
 }).call(this,require('_process'))
-},{"_process":90,"path-to-regexp":21}],21:[function(require,module,exports){
+},{"_process":94,"path-to-regexp":25}],25:[function(require,module,exports){
 var isArray = require('isarray');
 
 /**
@@ -12440,15 +12468,15 @@ function pathToRegexp (path, keys, options) {
   return attachKeys(new RegExp('^' + route, flags(options)), keys);
 }
 
-},{"isarray":22}],22:[function(require,module,exports){
+},{"isarray":26}],26:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],23:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 module.exports = require('./lib/');
 
-},{"./lib/":24}],24:[function(require,module,exports){
+},{"./lib/":28}],28:[function(require,module,exports){
 // Load modules
 
 var Stringify = require('./stringify');
@@ -12465,7 +12493,7 @@ module.exports = {
     parse: Parse
 };
 
-},{"./parse":25,"./stringify":26}],25:[function(require,module,exports){
+},{"./parse":29,"./stringify":30}],29:[function(require,module,exports){
 // Load modules
 
 var Utils = require('./utils');
@@ -12633,7 +12661,7 @@ module.exports = function (str, options) {
     return Utils.compact(obj);
 };
 
-},{"./utils":27}],26:[function(require,module,exports){
+},{"./utils":31}],30:[function(require,module,exports){
 // Load modules
 
 var Utils = require('./utils');
@@ -12756,7 +12784,7 @@ module.exports = function (obj, options) {
     return keys.join(delimiter);
 };
 
-},{"./utils":27}],27:[function(require,module,exports){
+},{"./utils":31}],31:[function(require,module,exports){
 // Load modules
 
 
@@ -12948,7 +12976,7 @@ exports.isBuffer = function (obj) {
               obj.constructor.isBuffer(obj));
 };
 
-},{}],28:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var _ = require('../util')
 
 /**
@@ -12995,7 +13023,7 @@ exports.$addChild = function (opts, BaseCtor) {
   var child = new ChildVue(opts)
   return child
 }
-},{"../util":85}],29:[function(require,module,exports){
+},{"../util":89}],33:[function(require,module,exports){
 var _ = require('../util')
 var Watcher = require('../watcher')
 var Path = require('../parsers/path')
@@ -13162,7 +13190,7 @@ exports.$log = function (path) {
   }
   console.log(data)
 }
-},{"../parsers/directive":73,"../parsers/expression":74,"../parsers/path":75,"../parsers/text":77,"../util":85,"../watcher":89}],30:[function(require,module,exports){
+},{"../parsers/directive":77,"../parsers/expression":78,"../parsers/path":79,"../parsers/text":81,"../util":89,"../watcher":93}],34:[function(require,module,exports){
 var _ = require('../util')
 var transition = require('../transition')
 
@@ -13374,7 +13402,7 @@ function remove (el, vm, cb) {
   _.remove(el)
   if (cb) cb()
 }
-},{"../transition":79,"../util":85}],31:[function(require,module,exports){
+},{"../transition":83,"../util":89}],35:[function(require,module,exports){
 var _ = require('../util')
 
 /**
@@ -13549,7 +13577,7 @@ function modifyListenerCount (vm, event, count) {
     parent = parent.$parent
   }
 }
-},{"../util":85}],32:[function(require,module,exports){
+},{"../util":89}],36:[function(require,module,exports){
 var _ = require('../util')
 var mergeOptions = require('../util/merge-option')
 
@@ -13700,7 +13728,7 @@ function createAssetRegisters (Constructor) {
 }
 
 createAssetRegisters(exports)
-},{"../compiler/compile":36,"../compiler/transclude":37,"../config":38,"../parsers/directive":73,"../parsers/expression":74,"../parsers/path":75,"../parsers/template":76,"../parsers/text":77,"../util":85,"../util/merge-option":87}],33:[function(require,module,exports){
+},{"../compiler/compile":40,"../compiler/transclude":41,"../config":42,"../parsers/directive":77,"../parsers/expression":78,"../parsers/path":79,"../parsers/template":80,"../parsers/text":81,"../util":89,"../util/merge-option":91}],37:[function(require,module,exports){
 var _ = require('../util')
 var compile = require('../compiler/compile')
 
@@ -13773,7 +13801,7 @@ exports.$destroy = function (remove, deferCleanup) {
 exports.$compile = function (el) {
   return compile(el, this.$options, true)(this, el)
 }
-},{"../compiler/compile":36,"../util":85}],34:[function(require,module,exports){
+},{"../compiler/compile":40,"../util":89}],38:[function(require,module,exports){
 var _ = require('./util')
 var MAX_UPDATE_COUNT = 10
 
@@ -13868,7 +13896,7 @@ exports.push = function (job) {
     }
   }
 }
-},{"./util":85}],35:[function(require,module,exports){
+},{"./util":89}],39:[function(require,module,exports){
 /**
  * A doubly linked list-based Least Recently Used (LRU)
  * cache. Will keep most recently used items while
@@ -13981,7 +14009,7 @@ p.get = function (key, returnEntry) {
 }
 
 module.exports = Cache
-},{}],36:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 var _ = require('../util')
 var config = require('../config')
 var textParser = require('../parsers/text')
@@ -14634,7 +14662,7 @@ function checkTransclusion (el) {
     return true
   }
 }
-},{"../config":38,"../parsers/directive":73,"../parsers/template":76,"../parsers/text":77,"../util":85}],37:[function(require,module,exports){
+},{"../config":42,"../parsers/directive":77,"../parsers/template":80,"../parsers/text":81,"../util":89}],41:[function(require,module,exports){
 var _ = require('../util')
 var config = require('../config')
 var templateParser = require('../parsers/template')
@@ -14849,7 +14877,7 @@ function extractAttrs (attrs) {
   }
   return res
 }
-},{"../config":38,"../parsers/template":76,"../util":85}],38:[function(require,module,exports){
+},{"../config":42,"../parsers/template":80,"../util":89}],42:[function(require,module,exports){
 module.exports = {
 
   /**
@@ -14936,7 +14964,7 @@ Object.defineProperty(module.exports, 'delimiters', {
     this._delimitersChanged = true
   }
 })
-},{}],39:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 var _ = require('./util')
 var config = require('./config')
 var Watcher = require('./watcher')
@@ -15161,7 +15189,7 @@ p.set = function (value, lock) {
 }
 
 module.exports = Directive
-},{"./config":38,"./parsers/expression":74,"./parsers/text":77,"./util":85,"./watcher":89}],40:[function(require,module,exports){
+},{"./config":42,"./parsers/expression":78,"./parsers/text":81,"./util":89,"./watcher":93}],44:[function(require,module,exports){
 // xlink
 var xlinkNS = 'http://www.w3.org/1999/xlink'
 var xlinkRE = /^xlink:/
@@ -15194,7 +15222,7 @@ function xlinkHandler (value) {
     this.el.removeAttributeNS(xlinkNS, 'href')
   }
 }
-},{}],41:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 var _ = require('../util')
 var addClass = _.addClass
 var removeClass = _.removeClass
@@ -15213,7 +15241,7 @@ module.exports = function (value) {
     }
   }
 }
-},{"../util":85}],42:[function(require,module,exports){
+},{"../util":89}],46:[function(require,module,exports){
 var config = require('../config')
 
 module.exports = {
@@ -15226,7 +15254,7 @@ module.exports = {
   }
 
 }
-},{"../config":38}],43:[function(require,module,exports){
+},{"../config":42}],47:[function(require,module,exports){
 var _ = require('../util')
 var templateParser = require('../parsers/template')
 
@@ -15457,7 +15485,7 @@ module.exports = {
   }
 
 }
-},{"../parsers/template":76,"../util":85}],44:[function(require,module,exports){
+},{"../parsers/template":80,"../util":89}],48:[function(require,module,exports){
 module.exports = {
 
   isLiteral: true,
@@ -15471,7 +15499,7 @@ module.exports = {
   }
   
 }
-},{}],45:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 var _ = require('../util')
 
 module.exports = {
@@ -15508,7 +15536,7 @@ module.exports = {
   // so no need for unbind here.
 
 }
-},{"../util":85}],46:[function(require,module,exports){
+},{"../util":89}],50:[function(require,module,exports){
 var _ = require('../util')
 var templateParser = require('../parsers/template')
 
@@ -15547,7 +15575,7 @@ module.exports = {
   }
 
 }
-},{"../parsers/template":76,"../util":85}],47:[function(require,module,exports){
+},{"../parsers/template":80,"../util":89}],51:[function(require,module,exports){
 var _ = require('../util')
 var compile = require('../compiler/compile')
 var templateParser = require('../parsers/template')
@@ -15678,7 +15706,7 @@ function callDetach (child) {
     child._callHook('detached')
   }
 }
-},{"../compiler/compile":36,"../parsers/template":76,"../transition":79,"../util":85}],48:[function(require,module,exports){
+},{"../compiler/compile":40,"../parsers/template":80,"../transition":83,"../util":89}],52:[function(require,module,exports){
 // manipulation directives
 exports.text       = require('./text')
 exports.html       = require('./html')
@@ -15704,7 +15732,7 @@ exports['if']      = require('./if')
 // child vm communication directives
 exports['with']    = require('./with')
 exports.events     = require('./events')
-},{"./attr":40,"./class":41,"./cloak":42,"./component":43,"./el":44,"./events":45,"./html":46,"./if":47,"./model":51,"./on":54,"./partial":55,"./ref":56,"./repeat":57,"./show":58,"./style":59,"./text":60,"./transition":61,"./with":62}],49:[function(require,module,exports){
+},{"./attr":44,"./class":45,"./cloak":46,"./component":47,"./el":48,"./events":49,"./html":50,"./if":51,"./model":55,"./on":58,"./partial":59,"./ref":60,"./repeat":61,"./show":62,"./style":63,"./text":64,"./transition":65,"./with":66}],53:[function(require,module,exports){
 var _ = require('../../util')
 
 module.exports = {
@@ -15730,7 +15758,7 @@ module.exports = {
   }
 
 }
-},{"../../util":85}],50:[function(require,module,exports){
+},{"../../util":89}],54:[function(require,module,exports){
 var _ = require('../../util')
 
 module.exports = {
@@ -15879,7 +15907,7 @@ module.exports = {
   }
 
 }
-},{"../../util":85}],51:[function(require,module,exports){
+},{"../../util":89}],55:[function(require,module,exports){
 var _ = require('../../util')
 
 var handlers = {
@@ -15936,7 +15964,7 @@ module.exports = {
   }
 
 }
-},{"../../util":85,"./checkbox":49,"./default":50,"./radio":52,"./select":53}],52:[function(require,module,exports){
+},{"../../util":89,"./checkbox":53,"./default":54,"./radio":56,"./select":57}],56:[function(require,module,exports){
 var _ = require('../../util')
 
 module.exports = {
@@ -15963,7 +15991,7 @@ module.exports = {
   }
 
 }
-},{"../../util":85}],53:[function(require,module,exports){
+},{"../../util":89}],57:[function(require,module,exports){
 var _ = require('../../util')
 var Watcher = require('../../watcher')
 var dirParser = require('../../parsers/directive')
@@ -16144,7 +16172,7 @@ function indexOf (arr, val) {
   }
   return -1
 }
-},{"../../parsers/directive":73,"../../util":85,"../../watcher":89}],54:[function(require,module,exports){
+},{"../../parsers/directive":77,"../../util":89,"../../watcher":93}],58:[function(require,module,exports){
 var _ = require('../util')
 
 module.exports = {
@@ -16204,7 +16232,7 @@ module.exports = {
     _.off(this.el, 'load', this.iframeBind)
   }
 }
-},{"../util":85}],55:[function(require,module,exports){
+},{"../util":89}],59:[function(require,module,exports){
 var _ = require('../util')
 var templateParser = require('../parsers/template')
 var vIf = require('./if')
@@ -16255,7 +16283,7 @@ module.exports = {
   }
 
 }
-},{"../parsers/template":76,"../util":85,"./if":47}],56:[function(require,module,exports){
+},{"../parsers/template":80,"../util":89,"./if":51}],60:[function(require,module,exports){
 var _ = require('../util')
 
 module.exports = {
@@ -16279,7 +16307,7 @@ module.exports = {
   }
   
 }
-},{"../util":85}],57:[function(require,module,exports){
+},{"../util":89}],61:[function(require,module,exports){
 var _ = require('../util')
 var isObject = _.isObject
 var isPlainObject = _.isPlainObject
@@ -16817,7 +16845,7 @@ function range (n) {
   }
   return ret
 }
-},{"../compiler/compile":36,"../compiler/transclude":37,"../parsers/expression":74,"../parsers/template":76,"../parsers/text":77,"../util":85,"../util/merge-option":87}],58:[function(require,module,exports){
+},{"../compiler/compile":40,"../compiler/transclude":41,"../parsers/expression":78,"../parsers/template":80,"../parsers/text":81,"../util":89,"../util/merge-option":91}],62:[function(require,module,exports){
 var transition = require('../transition')
 
 module.exports = function (value) {
@@ -16826,7 +16854,7 @@ module.exports = function (value) {
     el.style.display = value ? '' : 'none'
   }, this.vm)
 }
-},{"../transition":79}],59:[function(require,module,exports){
+},{"../transition":83}],63:[function(require,module,exports){
 var _ = require('../util')
 var prefixes = ['-webkit-', '-moz-', '-ms-']
 var camelPrefixes = ['Webkit', 'Moz', 'ms']
@@ -16927,7 +16955,7 @@ function prefix (prop) {
     }
   }
 }
-},{"../util":85}],60:[function(require,module,exports){
+},{"../util":89}],64:[function(require,module,exports){
 var _ = require('../util')
 
 module.exports = {
@@ -16943,7 +16971,7 @@ module.exports = {
   }
   
 }
-},{"../util":85}],61:[function(require,module,exports){
+},{"../util":89}],65:[function(require,module,exports){
 module.exports = {
 
   priority: 1000,
@@ -16968,7 +16996,7 @@ module.exports = {
   }
 
 }
-},{}],62:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 var _ = require('../util')
 var Watcher = require('../watcher')
 var expParser = require('../parsers/expression')
@@ -17055,7 +17083,7 @@ module.exports = {
   }
 
 }
-},{"../parsers/expression":74,"../util":85,"../watcher":89}],63:[function(require,module,exports){
+},{"../parsers/expression":78,"../util":89,"../watcher":93}],67:[function(require,module,exports){
 var _ = require('../util')
 var Path = require('../parsers/path')
 
@@ -17143,7 +17171,7 @@ function contains (val, search) {
     return val.toString().toLowerCase().indexOf(search) > -1
   }
 }
-},{"../parsers/path":75,"../util":85}],64:[function(require,module,exports){
+},{"../parsers/path":79,"../util":89}],68:[function(require,module,exports){
 var _ = require('../util')
 
 /**
@@ -17281,7 +17309,7 @@ exports.key.keyCodes = keyCodes
 
 _.extend(exports, require('./array-filters'))
 
-},{"../util":85,"./array-filters":63}],65:[function(require,module,exports){
+},{"../util":89,"./array-filters":67}],69:[function(require,module,exports){
 var _ = require('../util')
 var Directive = require('../directive')
 var compile = require('../compiler/compile')
@@ -17448,7 +17476,7 @@ exports._cleanup = function () {
   // turn off all instance listeners.
   this.$off()
 }
-},{"../compiler/compile":36,"../compiler/transclude":37,"../directive":39,"../util":85}],66:[function(require,module,exports){
+},{"../compiler/compile":40,"../compiler/transclude":41,"../directive":43,"../util":89}],70:[function(require,module,exports){
 var _ = require('../util')
 var inDoc = _.inDoc
 
@@ -17587,7 +17615,7 @@ exports._callHook = function (hook) {
   }
   this.$emit('hook:' + hook)
 }
-},{"../util":85}],67:[function(require,module,exports){
+},{"../util":89}],71:[function(require,module,exports){
 var mergeOptions = require('../util/merge-option')
 
 /**
@@ -17685,7 +17713,7 @@ exports._init = function (options) {
     this.$mount(options.el)
   }
 }
-},{"../util/merge-option":87}],68:[function(require,module,exports){
+},{"../util/merge-option":91}],72:[function(require,module,exports){
 var _ = require('../util')
 var Observer = require('../observer')
 var Dep = require('../observer/dep')
@@ -17900,7 +17928,7 @@ exports._defineMeta = function (key, value) {
     }
   })
 }
-},{"../observer":71,"../observer/dep":70,"../util":85}],69:[function(require,module,exports){
+},{"../observer":75,"../observer/dep":74,"../util":89}],73:[function(require,module,exports){
 var _ = require('../util')
 var arrayProto = Array.prototype
 var arrayMethods = Object.create(arrayProto)
@@ -17991,7 +18019,7 @@ _.define(
 )
 
 module.exports = arrayMethods
-},{"../util":85}],70:[function(require,module,exports){
+},{"../util":89}],74:[function(require,module,exports){
 var uid = 0
 var _ = require('../util')
 
@@ -18045,7 +18073,7 @@ p.notify = function () {
 }
 
 module.exports = Dep
-},{"../util":85}],71:[function(require,module,exports){
+},{"../util":89}],75:[function(require,module,exports){
 var _ = require('../util')
 var config = require('../config')
 var Dep = require('./dep')
@@ -18282,7 +18310,7 @@ p.removeVm = function (vm) {
 
 module.exports = Observer
 
-},{"../config":38,"../util":85,"./array":69,"./dep":70,"./object":72}],72:[function(require,module,exports){
+},{"../config":42,"../util":89,"./array":73,"./dep":74,"./object":76}],76:[function(require,module,exports){
 var _ = require('../util')
 var objProto = Object.prototype
 
@@ -18367,7 +18395,7 @@ _.define(
     }
   }
 )
-},{"../util":85}],73:[function(require,module,exports){
+},{"../util":89}],77:[function(require,module,exports){
 var _ = require('../util')
 var Cache = require('../cache')
 var cache = new Cache(1000)
@@ -18527,7 +18555,7 @@ exports.parse = function (s) {
   cache.put(s, dirs)
   return dirs
 }
-},{"../cache":35,"../util":85}],74:[function(require,module,exports){
+},{"../cache":39,"../util":89}],78:[function(require,module,exports){
 var _ = require('../util')
 var Path = require('./path')
 var Cache = require('../cache')
@@ -18783,7 +18811,7 @@ exports.parse = function (exp, needSet) {
 
 // Export the pathRegex for external use
 exports.pathTestRE = pathTestRE
-},{"../cache":35,"../util":85,"./path":75}],75:[function(require,module,exports){
+},{"../cache":39,"../util":89,"./path":79}],79:[function(require,module,exports){
 var _ = require('../util')
 var Cache = require('../cache')
 var pathCache = new Cache(1000)
@@ -19081,7 +19109,7 @@ exports.set = function (obj, path, val) {
   }
   return true
 }
-},{"../cache":35,"../util":85}],76:[function(require,module,exports){
+},{"../cache":39,"../util":89}],80:[function(require,module,exports){
 var _ = require('../util')
 var Cache = require('../cache')
 var templateCache = new Cache(1000)
@@ -19342,7 +19370,7 @@ exports.parse = function (template, clone, noSelector) {
     ? exports.clone(frag)
     : frag
 }
-},{"../cache":35,"../util":85}],77:[function(require,module,exports){
+},{"../cache":39,"../util":89}],81:[function(require,module,exports){
 var Cache = require('../cache')
 var config = require('../config')
 var dirParser = require('./directive')
@@ -19522,7 +19550,7 @@ function inlineFilters (exp) {
     }
   }
 }
-},{"../cache":35,"../config":38,"./directive":73}],78:[function(require,module,exports){
+},{"../cache":39,"../config":42,"./directive":77}],82:[function(require,module,exports){
 var _ = require('../util')
 var addClass = _.addClass
 var removeClass = _.removeClass
@@ -19712,7 +19740,7 @@ module.exports = function (el, direction, op, data, cb) {
     push(el, direction, op, leaveClass, cb)
   }
 }
-},{"../util":85}],79:[function(require,module,exports){
+},{"../util":89}],83:[function(require,module,exports){
 var _ = require('../util')
 var applyCSSTransition = require('./css')
 var applyJSTransition = require('./js')
@@ -19873,7 +19901,7 @@ var apply = exports.apply = function (el, direction, op, vm, cb) {
     if (cb) cb()
   }
 }
-},{"../util":85,"./css":78,"./js":80}],80:[function(require,module,exports){
+},{"../util":89,"./css":82,"./js":84}],84:[function(require,module,exports){
 /**
  * Apply JavaScript enter/leave functions.
  *
@@ -19920,7 +19948,7 @@ module.exports = function (el, direction, op, data, def, vm, cb) {
     }
   }
 }
-},{}],81:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 var config = require('../config')
 
 /**
@@ -19974,7 +20002,7 @@ function enableDebug () {
     }
   }
 }
-},{"../config":38}],82:[function(require,module,exports){
+},{"../config":42}],86:[function(require,module,exports){
 var config = require('../config')
 
 /**
@@ -20184,7 +20212,7 @@ exports.extractContent = function (el, asFragment) {
   return rawContent
 }
 
-},{"../config":38}],83:[function(require,module,exports){
+},{"../config":42}],87:[function(require,module,exports){
 /**
  * Can we use __proto__?
  *
@@ -20286,7 +20314,7 @@ if (inBrowser && !exports.isIE9) {
     ? 'webkitAnimationEnd'
     : 'animationend'
 }
-},{}],84:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 var _ = require('./debug')
 
 /**
@@ -20359,7 +20387,7 @@ exports.applyFilters = function (value, filters, vm, oldVal) {
   }
   return value
 }
-},{"./debug":81}],85:[function(require,module,exports){
+},{"./debug":85}],89:[function(require,module,exports){
 var lang   = require('./lang')
 var extend = lang.extend
 
@@ -20368,7 +20396,7 @@ extend(exports, require('./env'))
 extend(exports, require('./dom'))
 extend(exports, require('./filter'))
 extend(exports, require('./debug'))
-},{"./debug":81,"./dom":82,"./env":83,"./filter":84,"./lang":86}],86:[function(require,module,exports){
+},{"./debug":85,"./dom":86,"./env":87,"./filter":88,"./lang":90}],90:[function(require,module,exports){
 /**
  * Check is a string starts with $ or _
  *
@@ -20599,7 +20627,7 @@ exports.debounce = function(func, wait) {
     return result
   }
 }
-},{}],87:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 var _ = require('./index')
 var extend = _.extend
 
@@ -20858,7 +20886,7 @@ module.exports = function mergeOptions (parent, child, vm) {
   }
   return options
 }
-},{"./index":85}],88:[function(require,module,exports){
+},{"./index":89}],92:[function(require,module,exports){
 var _ = require('./util')
 var extend = _.extend
 
@@ -20943,7 +20971,7 @@ extend(p, require('./api/child'))
 extend(p, require('./api/lifecycle'))
 
 module.exports = _.Vue = Vue
-},{"./api/child":28,"./api/data":29,"./api/dom":30,"./api/events":31,"./api/global":32,"./api/lifecycle":33,"./directives":48,"./filters":64,"./instance/compile":65,"./instance/events":66,"./instance/init":67,"./instance/scope":68,"./util":85}],89:[function(require,module,exports){
+},{"./api/child":32,"./api/data":33,"./api/dom":34,"./api/events":35,"./api/global":36,"./api/lifecycle":37,"./directives":52,"./filters":68,"./instance/compile":69,"./instance/events":70,"./instance/init":71,"./instance/scope":72,"./util":89}],93:[function(require,module,exports){
 var _ = require('./util')
 var config = require('./config')
 var Observer = require('./observer')
@@ -21204,7 +21232,7 @@ function traverse (obj) {
 }
 
 module.exports = Watcher
-},{"./batcher":34,"./config":38,"./observer":71,"./parsers/expression":74,"./util":85}],90:[function(require,module,exports){
+},{"./batcher":38,"./config":42,"./observer":75,"./parsers/expression":78,"./util":89}],94:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -21296,32 +21324,50 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],91:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 require('insert-css')(require('./app.css'))
 
 window.$ = window.jQuery = require("jquery");
 require("bootstrap");
 
-var Vue = require("vue"),
+var Vue  = require("vue"),
     Page = require("page"),
-    Qs = require("qs");
+    Qs   = require("qs");
 
 var vm = new Vue({
+
     el: "#app",
+
     components: {
-        navbar: require("./navbar-component")
+        navbar:  require("./navbar-component"),
+        ghoauth: require("./ghoauth-component"),
+        top:     require("./top-component")
     },
+
     template: require("./index.html"),
+
     data: {
-        text: "ok, mum",
+
+        currentView: "top",
+        currentCtx:  {},
+
         prism_base_url: "http://localhost:13333",
+
         user: {
-            id: "",
-            name: "mk2",
+            id:          "",
+            name:        "mk2",
             login_state: false
+        },
+
+        github_oauth: {
+            code: ""
         }
+
     },
+
     created: function () {
+
+        var self = this;
 
         console.log("Start");
 
@@ -21332,10 +21378,11 @@ var vm = new Vue({
 
         Page("/ghoauth", function (ctx, next) {
 
-            var obj = Qs.parse(ctx.querystring),
-                code = obj.code;
+            var obj = Qs.parse(ctx.querystring);
 
-            console.log("code: ", code);
+            self.github_oauth.code = obj.code;
+            self.currentCtx        = ctx;
+            self.currentView       = "ghoauth";
 
             next();
         });
@@ -21345,10 +21392,8 @@ var vm = new Vue({
             next();
         });
 
-        Page({
-            hashbang: true
-        });
+        Page();
 
     }
 });
-},{"./app.css":1,"./index.html":2,"./navbar-component":3,"bootstrap":5,"insert-css":18,"jquery":19,"page":20,"qs":23,"vue":88}]},{},[91]);
+},{"./app.css":1,"./ghoauth-component":2,"./index.html":4,"./navbar-component":5,"./top-component":7,"bootstrap":9,"insert-css":22,"jquery":23,"page":24,"qs":27,"vue":92}]},{},[95]);
