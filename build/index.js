@@ -15,8 +15,8 @@ module.exports = {
 
 };
 },{"./template.html":3}],3:[function(require,module,exports){
-arguments[4][1][0].apply(exports,arguments)
-},{"dup":1}],4:[function(require,module,exports){
+module.exports = '<h1>ghoauth</h1>';
+},{}],4:[function(require,module,exports){
 module.exports = '<div>\n    <div v-component="navbar"></div>\n</div>\n<div v-component="{{currentView}}">\n</div>';
 },{}],5:[function(require,module,exports){
 module.exports = {
@@ -25,48 +25,24 @@ module.exports = {
     inherit:  true,
     data:     function () {
         return {
-            github_login_url: ""
         };
     },
     methods:  {
 
-        willGetGithubOAuthInfo: function () {
-
-            var self = this;
-
-            return $.ajax({
-                url:      self.prism_base_url + "/ghoauth/",
-                dataType: "json"
-            });
-        }
 
     },
     created:  function () {
 
-        var Qs   = require("qs"),
-            self = this;
-
-        this.willGetGithubOAuthInfo().done(function (data, status, jqxhr) {
-
-            console.log("Given github oauth settings: ", data);
-
-            self.github_login_url =
-                data.oauth_entry_url + "?" + Qs.stringify({
-                    client_id:    data.client_id,
-                    state:        data.state,
-                    redirect_uri: "https://prism-client.github.io/ghoauth"
-                });
-
-        }).fail(function (err) {
-
-            console.error(err);
-
-        });
-
     },
-    computed: {}
+    computed: {
+
+        github_login_url: function() {
+            return this.prism_base_url + "/auth/github/login";
+        }
+
+    }
 };
-},{"./template.html":6,"qs":27}],6:[function(require,module,exports){
+},{"./template.html":6}],6:[function(require,module,exports){
 module.exports = '<nav class="navbar navbar-default">\n    <div class="container-fluid">\n        <!-- Brand and toggle get grouped for better mobile display -->\n        <div class="navbar-header">\n            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"\n                    data-target="#bs-example-navbar-collapse-1">\n                <span class="sr-only">Toggle navigation</span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n                <span class="icon-bar"></span>\n            </button>\n            <a class="navbar-brand" href="#">Prism</a>\n        </div>\n\n        <!-- Collect the nav links, forms, and other content for toggling -->\n        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">\n            <ul class="nav navbar-nav">\n                <li><a href="#">Link</a></li>\n                <li class="dropdown">\n                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown\n                        <span class="caret"></span></a>\n                    <ul class="dropdown-menu" role="menu">\n                        <li><a href="#">Action</a></li>\n                        <li><a href="#">Another action</a></li>\n                        <li><a href="#">Something else here</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">Separated link</a></li>\n                        <li class="divider"></li>\n                        <li><a href="#">One more separated link</a></li>\n                    </ul>\n                </li>\n            </ul>\n            <template v-if="!user.login_state">\n                <div class="navbar-form navbar-right">\n                    <a href="{{github_login_url}}" class="btn btn-primary">Login with Github</a>\n                </div>\n            </template>\n            <template v-if="user.login_state">\n                <ul class="nav navbar-nav navbar-right">\n                    <li class="dropdown">\n                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"\n                           aria-expanded="false">Login: {{user.name}}\n                            <span class="caret"></span></a>\n                        <ul class="dropdown-menu" role="menu">\n                            <li><a href="#">Preferences</a></li>\n                            <li class="divider"></li>\n                            <li><a href="#">Logout</a></li>\n                        </ul>\n                    </li>\n                </ul>\n            </template>\n        </div>\n        <!-- /.navbar-collapse -->\n    </div>\n    <!-- /.container-fluid -->\n</nav>';
 },{}],7:[function(require,module,exports){
 module.exports = {
@@ -21373,18 +21349,19 @@ var vm = new Vue({
 
         Page("/", function (ctx, next) {
 
-            next();
-        });
-
-        Page("/ghoauth", function (ctx, next) {
-
             var obj = Qs.parse(ctx.querystring);
 
-            self.github_oauth.code = obj.code;
-            self.currentCtx        = ctx;
-            self.currentView       = "ghoauth";
+            if (typeof obj.code !== "undefined") {
+                self.github_oauth.code = obj.code;
+                self.currentCtx        = ctx;
+                self.currentView       = "ghoauth";
 
-            next();
+                next();
+            } else {
+
+                next();
+            }
+
         });
 
         Page("*", function (ctx, next) {
