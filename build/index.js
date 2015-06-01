@@ -33,13 +33,6 @@ module.exports = {
     },
     created:  function () {
 
-    },
-    computed: {
-
-        github_login_url: function() {
-            return this.prism_base_url + "/auth/github/login";
-        }
-
     }
 };
 },{"./template.html":6}],6:[function(require,module,exports){
@@ -21336,7 +21329,8 @@ var vm = new Vue({
         },
 
         github_oauth: {
-            code: ""
+            code:  "",
+            state: ""
         }
 
     },
@@ -21345,16 +21339,15 @@ var vm = new Vue({
 
         var self = this;
 
-        console.log("Start");
-
         Page("/", function (ctx, next) {
 
             var obj = Qs.parse(ctx.querystring);
 
             if (typeof obj.code !== "undefined") {
-                self.github_oauth.code = obj.code;
-                self.currentCtx        = ctx;
-                self.currentView       = "ghoauth";
+                self.github_oauth.code  = obj.code;
+                self.github_oauth.state = obj.state;
+                self.currentCtx         = ctx;
+                self.currentView        = "ghoauth";
 
                 next();
             } else {
@@ -21370,6 +21363,19 @@ var vm = new Vue({
         });
 
         Page();
+
+    },
+
+    computed: {
+
+        github_login_url: function () {
+            return this.prism_base_url + "/auth/github/login";
+        },
+
+
+        github_callback_url: function () {
+            return this.prism_base_url + "/auth/github/callback";
+        }
 
     }
 });
