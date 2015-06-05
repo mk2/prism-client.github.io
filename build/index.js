@@ -9,7 +9,7 @@ module.exports = {
     data:     function () {
         return {};
     },
-    created: function() {
+    created:  function () {
         console.log("currentCtx: ", this.currentCtx);
     }
 
@@ -21344,10 +21344,13 @@ var vm = new Vue({
             var obj = Qs.parse(ctx.querystring);
 
             if (typeof obj.code !== "undefined") {
+
                 self.github_oauth.code  = obj.code;
                 self.github_oauth.state = obj.state;
                 self.currentCtx         = ctx;
                 self.currentView        = "ghoauth";
+
+                self.startAfterCallback();
 
                 next();
             } else {
@@ -21363,6 +21366,44 @@ var vm = new Vue({
         });
 
         Page();
+
+    },
+
+    methods: {
+
+        startAfterCallback: function () {
+
+            var self = this;
+
+            this.willRequestCallback().then(function (data) {
+
+                console.log("Login success: ", data);
+
+                self.user.login_state = true;
+
+            }).fail(function (err) {
+
+                console.log("Login fail: ", err);
+
+            });
+
+        },
+
+        willRequestCallback: function () {
+
+            var self = this;
+
+            return $.ajax(self.github_callback_url, {
+                method:    "POST",
+                data:      {
+                    code:  self.github_oauth.code,
+                    state: self.github_oauth.state
+                },
+                xhrFields: {
+                    withCredentials: true
+                }
+            })
+        }
 
     },
 
